@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Employee Page";
+    Layout = "_ManagerLayout";
+}
+@model ICollection<_2051010166_NguyenTranThanhLiem.Models.Employee>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Trang quản lý nhân viên</h1>
+        <a href="@Url.Action("CreateEmployee","Manager")" class="btn btn-success">Thêm mới</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Họ và tên</th>
+                    <th>Số CMND/CCCD</th>
+                    <th>Địa chỉ</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                    <th>Giới tính</th>
+                    <th>Chức vụ</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.FullName</td>
+                        <td>@employee.DocumentNumber</td>
+                        <td>@employee.Address</td>
+                        <td>@employee.Email</td>
+                        <td>@employee.PhoneNumber</td>
+                        <td>@(employee.Sex == 0 ? "Nữ" : "Nam")</td>
+                        <td>@employee.Position</td>
+                        <td>
+                            <a href="@Url.Action("EditEmployee","Manager", new { id=employee.Id })" class="btn btn-primary btn-sm me-1">Sửa</a>
+                            <a href="@Url.Action("DeleteEmployee","Manager", new { id=employee.Id })" class="btn btn-danger btn-sm">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

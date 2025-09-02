@@ -1,16 +1,24 @@
-﻿using _2051010166_NguyenTranThanhLiem.Models;
+﻿using _2051010166_NguyenTranThanhLiem.Interfaces;
+using _2051010166_NguyenTranThanhLiem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace _2051010166_NguyenTranThanhLiem.Controllers
 {
-    public class ManagerController : Controller
+    [Authorize(Roles = "Admin")]
+    public class AdminController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<AdminController> _logger;
+        private readonly IResidentRepository _residentRepo;
+        private readonly IEmployeeRepository _employeeRepo;
 
-        public ManagerController(ILogger<HomeController> logger)
+        public AdminController(ILogger<AdminController> logger, IResidentRepository residentRepo, IEmployeeRepository employeeRepo)
         {
             _logger = logger;
+            _residentRepo = residentRepo;
+            _employeeRepo = employeeRepo;
+
         }
 
         public IActionResult Index()
@@ -19,7 +27,8 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
         }
         public IActionResult Resident()
         {
-            return View();
+            var residents = _residentRepo.GetResidents(); 
+            return View(residents); 
         }
         public IActionResult Apartment()
         {
@@ -27,7 +36,8 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
         }
         public IActionResult Employee()
         {
-            return View();
+            var employees = _employeeRepo.GetEmployees();
+            return View(employees);
         }
         public IActionResult Setting()
         {

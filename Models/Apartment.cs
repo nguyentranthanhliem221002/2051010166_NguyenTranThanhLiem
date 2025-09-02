@@ -6,9 +6,10 @@ namespace _2051010166_NguyenTranThanhLiem.Models
 {
     public class Apartment : Base
     {
-        [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Code { get; set; }
         public int Floor { get; set; }
+        public Guid PersonId { get; set; }
+        public Person Person { get; set; }
     }
 }
