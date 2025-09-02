@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Navbar";
+}
+
+<div class="navv">
+    <ul class="list-unstyled d-flex justify-content-around align-content-center">
+        <li><a asp-controller="Home" asp-action="Index">Logo</a></li>
+        <li class="">
+            <ul class="list-unstyled d-flex gap-5">
+                <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li><a asp-controller="Home" asp-action="About">Giới thiệu</a></li>
+                <li><a asp-controller="Home" asp-action="Contact">Liên hệ</a></li>
+            </ul>
+        </li>
+        <li><a asp-controller="Home" asp-action="Login">Đăng nhập</a></li>
+        @*     <li class="">
+            @if ()
+            {
+                <a asp-action="">Đăng nhập</a>
+            }
+            else
+            {
+                <a asp-action="">Đăng ký</a>
+            }
+        </li> *@
+   </ul>
+</div>

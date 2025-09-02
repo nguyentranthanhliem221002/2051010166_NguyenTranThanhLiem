@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Sidebar";
+}
+
+@{
+    ViewData["Title"] = "Sidebar";
+}
+
+<div class="sidebar p-3">
+    <ul class="nav flex-column text-center">
+        <!-- Logo -->
+        <li class="nav-item mb-4">
+            <a class="nav-link fw-bold fs-4" asp-controller="Manager" asp-action="Index">
+                LOGO
+            </a>
+        </li>
+
+        <!-- Menu Items -->
+        <li class="nav-item mb-2">
+            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Apartment">
+                Quản lý căn hộ
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Resident">
+                Quản lý cư dân
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Employee">
+                Quản lý nhân viên
+            </a>
+        </li>
+        <li class="nav-item mt-3">
+            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Setting">
+                Cài đặt
+            </a>
+        </li>
+    </ul>
+</div>
