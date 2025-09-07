@@ -1,0 +1,57 @@
+﻿@model _2051010166_NguyenTranThanhLiem.Models.User
+
+
+<form asp-action="CreateResident" asp-controller="Admin" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Họ và tên</label>
+        <input asp-for="FullName" class="form-control" required />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">CMND/CCCD</label>
+        <input asp-for="DocumentNumber" class="form-control" required />
+        <span asp-validation-for="DocumentNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Địa chỉ</label>
+        <input asp-for="Address" class="form-control" required />
+        <span asp-validation-for="Address" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Số điện thoại</label>
+        <input asp-for="PhoneNumber" class="form-control" required />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Giới tính</label>
+        <select asp-for="Sex" class="form-select">
+            <option value="0">Nữ</option>
+            <option value="1">Nam</option>
+        </select>
+        <span asp-validation-for="Sex" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Chức vụ</label>
+        <input asp-for="Position" class="form-control" />
+        <span asp-validation-for="Position" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Thêm mới</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    </div>
+</form>
+

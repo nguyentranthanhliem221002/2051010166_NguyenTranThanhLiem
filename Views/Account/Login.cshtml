@@ -29,7 +29,7 @@
                     </div>
                 }
 
-                <form asp-controller="Account" asp-action="Login" method="post">
+                <form id="loginForm" asp-controller="Account" asp-action="Login" method="post">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required autofocus />
@@ -37,7 +37,12 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label">Mật khẩu</label>
-                        <input type="password" class="form-control" id="password" name="password" required />
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" required />
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="mb-3 form-check">
@@ -61,3 +66,44 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<style>
+    body {
+        background-image: url('/images/background_login.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover; /* hoặc contain nếu muốn vừa với màn hình */
+        background-attachment: fixed;
+    }
+
+</style>
+<script>
+    $(document).ready(function () {
+        // Load dữ liệu đã lưu
+        if (localStorage.getItem('rememberMe') === 'true') {
+            $('#email').val(localStorage.getItem('email'));
+            $('#password').val(localStorage.getItem('password'));
+            $('#rememberMe').prop('checked', true);
+        }
+
+        // Toggle hiện/ẩn mật khẩu
+        $('#togglePassword').click(function () {
+            const passInput = $('#password');
+            const type = passInput.attr('type') === 'password' ? 'text' : 'password';
+            passInput.attr('type', type);
+            $(this).find('i').toggleClass('bi-eye bi-eye-slash');
+        });
+
+        // Lưu thông tin khi submit nếu checked
+        $('#loginForm').submit(function () {
+            if ($('#rememberMe').is(':checked')) {
+                localStorage.setItem('email', $('#email').val());
+                localStorage.setItem('password', $('#password').val());
+                localStorage.setItem('rememberMe', 'true');
+            } else {
+                localStorage.removeItem('email');
+                localStorage.removeItem('password');
+                localStorage.setItem('rememberMe', 'false');
+            }
+        });
+    });
+</script>

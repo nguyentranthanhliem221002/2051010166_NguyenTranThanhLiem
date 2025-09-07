@@ -13,29 +13,32 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             _context = context;
         }
 
-        public ICollection<Person> GetResidents()
+        public ICollection<User> GetResidents()
         {
-            return _context.Persons
-                           .Where(x => x.Status >= 0 && x.IsResident)
-                           .ToList(); 
+            return _context.Users
+                .Where(x => x.Status >= 0 && x.IsResident && x.Position == "")
+                .OrderByDescending(x => x.CreatedDate) // hoặc x.Id
+                .ToList();
+
         }
 
-        public Person GetResidentById(Guid id)
+        public User GetResidentById(Guid id)
         {
-            return _context.Persons.FirstOrDefault(x => x.Id == id && x.IsResident);
+            return _context.Users.FirstOrDefault(x => x.Id == id && x.IsResident);
         }
 
 
-        public void AddResident(Person resident)
+        public void AddResident(User resident)
         {
             resident.IsResident = true; // chắc chắn là cư dân
-            _context.Persons.Add(resident);
+            resident.CreatedDate = DateTime.Now;
+            _context.Users.Add(resident);
             _context.SaveChanges();
         }
 
-        public void UpdateResident(Person resident)
+        public void UpdateResident(User resident)
         {
-            var existing = _context.Persons.FirstOrDefault(x => x.Id == resident.Id && x.IsResident);
+            var existing = _context.Users.FirstOrDefault(x => x.Id == resident.Id && x.IsResident);
             if (existing != null)
             {
                 existing.FullName = resident.FullName;
@@ -45,18 +48,30 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                 existing.PhoneNumber = resident.PhoneNumber;
                 existing.Sex = resident.Sex;
                 existing.Status = resident.Status;
+                existing.UpdatedDate = resident.UpdatedDate;
                 _context.SaveChanges();
             }
         }
 
-        public void DeleteResident(Guid id)
+        public bool DeleteResident(Guid id)
         {
-            var resident = _context.Persons.FirstOrDefault(x => x.Id == id && x.IsResident);
+            var resident = _context.Users.FirstOrDefault(x => x.Id == id && x.IsResident);
             if (resident != null)
             {
                 resident.Status = -1;
                 _context.SaveChanges();
+                return true;
             }
+            return false;
+        }
+
+        public Guid GetPersonIdByUserId(Guid userId)
+        {
+            // Tìm personId dựa vào UserId
+            var person = _context.Users.FirstOrDefault(p => p.Id == userId);
+            if (person == null) return Guid.Empty;
+
+            return person.Id; // Id chính là PersonId
         }
 
     }

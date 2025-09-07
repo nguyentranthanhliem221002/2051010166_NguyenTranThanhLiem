@@ -1,0 +1,136 @@
+﻿@using _2051010166_NguyenTranThanhLiem.ViewModels
+@model PaymentViewModel
+@{
+    ViewData["Title"] = "Payment Page";
+    Layout = "_ManagerLayout";
+}
+<h1 class="text-center">Hóa đơn</h1>
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <label for="invoiceType" class="form-label fw-bold">Chọn loại hóa đơn:</label>
+        <select id="invoiceType" class="form-select w-50">
+            <option value="vehicle" selected>Phí đăng ký xe</option>
+            <option value="electricity">Điện</option>
+            <option value="water">Nước</option>
+            <option value="wifi">Wifi</option>
+            <option value="garbage">Rác</option>
+            <option value="maintenance">Bảo trì</option>
+        </select>
+    </div>
+
+    <!-- Hóa đơn xe -->
+    <div id="invoice-vehicle" class="invoice-section">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Hóa đơn phí đăng ký xe</h4>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Biển số</th>
+                            <th>Loại xe</th>
+                            <th>Phí đăng ký</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var vehicle in Model.Vehicles)
+                        {
+                            <tr>
+                                <td>@vehicle.LicensePlate</td>
+                                <td>@vehicle.VehicleType.Name</td>
+                                <td class="text-end">
+                                    @string.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", vehicle.VehicleType.Fee)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h5 class="mb-0 text-danger">
+                        Tổng phí: @string.Format(new System.Globalization.CultureInfo("vi-VN"), "{0:C0}", Model.TotalFee)
+                    </h5>
+                    <form asp-action="ProcessPayment" method="post">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-credit-card"></i> Thanh toán
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hóa đơn điện -->
+    <div id="invoice-electricity" class="invoice-section d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0">Hóa đơn điện</h4>
+            </div>
+            <div class="card-body">
+                <p>Thông tin hóa đơn điện sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hóa đơn nước -->
+    <div id="invoice-water" class="invoice-section d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">Hóa đơn nước</h4>
+            </div>
+            <div class="card-body">
+                <p>Thông tin hóa đơn nước sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hóa đơn wifi -->
+    <div id="invoice-wifi" class="invoice-section d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0">Hóa đơn Wifi</h4>
+            </div>
+            <div class="card-body">
+                <p>Thông tin hóa đơn Wifi sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hóa đơn rác -->
+    <div id="invoice-garbage" class="invoice-section d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Hóa đơn Rác</h4>
+            </div>
+            <div class="card-body">
+                <p>Thông tin hóa đơn Rác sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hóa đơn bảo trì -->
+    <div id="invoice-maintenance" class="invoice-section d-none">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">Hóa đơn Bảo trì</h4>
+            </div>
+            <div class="card-body">
+                <p>Thông tin hóa đơn Bảo trì sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("invoiceType").addEventListener("change", function () {
+            var selected = this.value;
+            document.querySelectorAll(".invoice-section").forEach(function (el) {
+                el.classList.add("d-none"); // ẩn hết
+            });
+            document.getElementById("invoice-" + selected).classList.remove("d-none"); // hiện cái được chọn
+        });
+    </script>
+}

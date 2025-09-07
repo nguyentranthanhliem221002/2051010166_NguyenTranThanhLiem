@@ -1,0 +1,171 @@
+﻿@{
+    ViewData["Title"] = "Resident Page";
+    Layout = "_ManagerLayout";
+}
+@model ICollection<User>
+
+<h2>Danh sách cư dân</h2>
+
+<!-- Nút Thêm mới cư dân -->
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createResidentModal">
+    Thêm mới cư dân
+</button>
+
+<table class="table" id="residentTable">
+    <thead>
+        <tr>
+            <th>Họ và tên</th>
+            <th>Số CMND/CCCD</th>
+            <th>Địa chỉ</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Giới tính</th>
+            <th>Chức vụ</th> <!-- nếu muốn giống Employee -->
+        </tr>
+        <tr>
+            <!-- Hàng search -->
+            <th><input type="text" id="searchFullName" class="form-control form-control-sm" placeholder="Tìm họ tên" /></th>
+            <th><input type="text" id="searchDocumentNumber" class="form-control form-control-sm" placeholder="Tìm CMND" /></th>
+            <th><input type="text" id="searchAddress" class="form-control form-control-sm" placeholder="Tìm địa chỉ" /></th>
+            <th><input type="text" id="searchEmail" class="form-control form-control-sm" placeholder="Tìm email" /></th>
+            <th><input type="text" id="searchPhoneNumber" class="form-control form-control-sm" placeholder="Tìm số điện thoại" /></th>
+            <th>
+                <select id="searchSex" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Nam">Nam</option>
+                </select>
+            </th>
+            <th>
+                <select id="searchPosition" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    @foreach (var pos in Model.Select(e => e.Position).Distinct())
+                    {
+                        <option value="@pos">@pos</option>
+                    }
+                </select>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var person in Model)
+        {
+            <tr oncontextmenu="showContextMenu(event, '@person.Id')" data-id="@person.Id">
+                <td>@person.FullName</td>
+                <td>@person.DocumentNumber</td>
+                <td>@person.Address</td>
+                <td>@person.Email</td>
+                <td>@person.PhoneNumber</td>
+                <td>@(person.Sex == 0 ? "Nữ" : "Nam")</td>
+                <td>@person.Position</td> <!-- nếu muốn giống Employee -->
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Modal Thêm mới cư dân -->
+<div class="modal fade" id="createResidentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm cư dân mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("Partials/_CreateResident", new _2051010166_NguyenTranThanhLiem.Models.User())
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Context menu -->
+<div id="contextMenu" style="position:absolute; display:none; background:#fff; border:1px solid #ccc; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+    <a href="#" id="updateLink" class="dropdown-item">Cập nhật</a>
+    <a href="#" id="deleteLink" class="dropdown-item text-danger">Xóa</a>
+</div>
+
+@section Scripts {
+    <script>
+        var currentResidentId = null;
+
+        function showContextMenu(e, residentId) {
+            e.preventDefault();
+            currentResidentId = residentId;
+
+            var menu = document.getElementById('contextMenu');
+            menu.style.top = e.pageY + 'px';
+            menu.style.left = e.pageX + 'px';
+            menu.style.display = 'block';
+        }
+
+        document.addEventListener('click', function () {
+            document.getElementById('contextMenu').style.display = 'none';
+        });
+
+        document.getElementById('updateLink').addEventListener('click', function () {
+            if (currentResidentId)
+                window.location.href = '@Url.Action("EditResident", "Admin")?id=' + currentResidentId;
+        });
+
+        document.getElementById('deleteLink').addEventListener('click', function () {
+            if (!currentResidentId) return;
+
+            if (confirm("Bạn có chắc chắn muốn xóa cư dân này?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteResident", "Admin")',
+                    type: 'POST',
+                    data: { id: currentResidentId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                    success: function (response) {
+                        if (response.success) {
+                            $('tr[data-id="' + currentResidentId + '"]').remove();
+                            currentResidentId = null;
+                        } else {
+                            alert(response.message || "Xóa thất bại!");
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra!");
+                    }
+                });
+            }
+        });
+
+        // --- Filter Table ---
+        function filterResidentTable() {
+            var fullName = document.getElementById('searchFullName').value.toLowerCase();
+            var docNum = document.getElementById('searchDocumentNumber').value.toLowerCase();
+            var address = document.getElementById('searchAddress').value.toLowerCase();
+            var email = document.getElementById('searchEmail').value.toLowerCase();
+            var phone = document.getElementById('searchPhoneNumber').value.toLowerCase();
+            var sex = document.getElementById('searchSex').value;
+            var position = document.getElementById('searchPosition').value;
+
+            var trs = document.getElementById('residentTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (var i = 0; i < trs.length; i++) {
+                var tds = trs[i].getElementsByTagName('td');
+                var show =
+                    tds[0].innerText.toLowerCase().includes(fullName) &&
+                    tds[1].innerText.toLowerCase().includes(docNum) &&
+                    tds[2].innerText.toLowerCase().includes(address) &&
+                    tds[3].innerText.toLowerCase().includes(email) &&
+                    tds[4].innerText.toLowerCase().includes(phone) &&
+                    (sex === "" || tds[5].innerText === sex) &&
+                    (position === "" || tds[6].innerText === position);
+
+                trs[i].style.display = show ? '' : 'none';
+            }
+        }
+
+        // Event listener cho input
+        document.getElementById('searchFullName').addEventListener('keyup', filterResidentTable);
+        document.getElementById('searchDocumentNumber').addEventListener('keyup', filterResidentTable);
+        document.getElementById('searchAddress').addEventListener('keyup', filterResidentTable);
+        document.getElementById('searchEmail').addEventListener('keyup', filterResidentTable);
+        document.getElementById('searchPhoneNumber').addEventListener('keyup', filterResidentTable);
+
+        // Event listener cho select
+        document.getElementById('searchSex').addEventListener('change', filterResidentTable);
+        document.getElementById('searchPosition').addEventListener('change', filterResidentTable);
+    </script>
+}

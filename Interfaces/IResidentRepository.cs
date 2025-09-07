@@ -4,10 +4,11 @@ namespace _2051010166_NguyenTranThanhLiem.Interfaces
 {
     public interface IResidentRepository
     {
-        ICollection<Person> GetResidents();
-        Person GetResidentById(Guid id);
-        void AddResident(Person resident);
-        void UpdateResident(Person resident);
-        void DeleteResident(Guid id);
+        ICollection<User> GetResidents();
+        User GetResidentById(Guid id);
+        void AddResident(User resident);
+        void UpdateResident(User resident);
+        bool DeleteResident(Guid id);
+        Guid GetPersonIdByUserId(Guid userId);
     }
 }

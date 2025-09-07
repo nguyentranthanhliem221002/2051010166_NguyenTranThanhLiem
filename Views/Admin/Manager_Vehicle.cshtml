@@ -1,0 +1,191 @@
+﻿@{
+    ViewData["Title"] = "ParkingLot Page";
+    Layout = "_ManagerLayout";
+}
+
+@model IEnumerable<Vehicle>
+
+<h2>Danh sách đăng ký xe chờ duyệt</h2>
+
+ 
+
+<table class="table" id="vehicleTable">
+    <thead>
+        <tr>
+            <th>Biển số</th>
+            <th>Loại xe</th>
+            <th>Gói</th>
+            <th>Ngày bắt đầu</th>
+            <th>Màu</th>
+            <th>Trạng thái</th>
+        </tr>
+        <tr>
+            <!-- Đây là hàng search -->
+            <th><input type="text" id="searchLicensePlate" class="form-control form-control-sm" placeholder="Tìm biển số" /></th>
+            <th>
+                <select id="searchVehicleType" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    @foreach (var vt in Model.Select(m => m.VehicleType.Name).Distinct())
+                    {
+                        <option value="@vt">@vt</option>
+                    }
+                </select>
+            </th>
+            <th>
+                <select id="searchPackageMonths" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    @foreach (var pkg in Model.Select(m => m.PackageMonths).Distinct())
+                    {
+                        <option value="@pkg">@pkg tháng</option>
+                    }
+                </select>
+            </th>
+            <th>
+                <input type="date" id="searchStartDate" class="form-control form-control-sm" />
+            </th>
+            <th><input type="text" id="searchColor" class="form-control form-control-sm" placeholder="Tìm màu" /></th>
+            <th>
+                <select id="searchStatus" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    <option value="Pending">Chờ duyệt</option>
+                    <option value="Cancel">Từ chối</option>
+                    <option value="Done">Hoàn tất</option>
+                </select>
+            </th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr oncontextmenu="showContextMenu(event, '@item.Id', '@item.TrangThaiDuyet')">
+                <td>@item.LicensePlate</td>
+                <td>@item.VehicleType.Name</td>
+                <td>@item.PackageMonths tháng</td>
+                <td>@item.StartDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.Color</td>
+                <td>
+                    @switch (item.TrangThaiDuyet)
+                    {
+                        case Vehicle.ApprovalStatus.Pending:
+                            <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                            break;
+                        case Vehicle.ApprovalStatus.Cancel:
+                            <span class="badge bg-danger">Từ chối</span>
+                            break;
+                        case Vehicle.ApprovalStatus.Done:
+                            <span class="badge bg-success">Hoàn tất</span>
+                            break;
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Context menu -->
+<div id="contextMenu" style="position:absolute; display:none; background:#fff; border:1px solid #ccc; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+    <a href="#" id="approveLink" class="dropdown-item">Duyệt</a>
+    <a href="#" id="rejectLink" class="dropdown-item text-danger">Từ chối</a>
+    <a href="#" id="detailsLink" class="dropdown-item">Xem chi tiết</a>
+</div>
+
+@section Scripts {
+    <script>
+        var currentVehicleId = null;
+        var currentVehicleStatus = null;
+
+        function showContextMenu(e, vehicleId, status) {
+            e.preventDefault();
+            currentVehicleId = vehicleId;
+            currentVehicleStatus = status;
+
+            var menu = document.getElementById('contextMenu');
+
+            // Nếu trạng thái là Pending → hiển thị Duyệt/Từ chối, còn Cancel hoặc Done → ẩn
+            if (currentVehicleStatus === 'Pending') {
+                document.getElementById('approveLink').style.display = 'block';
+                document.getElementById('rejectLink').style.display = 'block';
+            } else {
+                document.getElementById('approveLink').style.display = 'none';
+                document.getElementById('rejectLink').style.display = 'none';
+            }
+
+            document.getElementById('detailsLink').style.display = 'block';
+
+            menu.style.top = e.pageY + 'px';
+            menu.style.left = e.pageX + 'px';
+            menu.style.display = 'block';
+        }
+
+        document.addEventListener('click', function () {
+            document.getElementById('contextMenu').style.display = 'none';
+        });
+
+        document.getElementById('approveLink').addEventListener('click', function () {
+            window.location.href = '@Url.Action("VehicleEdit", "Admin")?id=' + currentVehicleId + '&isApproved=true';
+        });
+
+        document.getElementById('rejectLink').addEventListener('click', function () {
+            window.location.href = '@Url.Action("VehicleEdit", "Admin")?id=' + currentVehicleId + '&isApproved=false';
+        });
+
+        document.getElementById('detailsLink').addEventListener('click', function () {
+            window.location.href = '@Url.Action("VehicleDetails", "Admin")?id=' + currentVehicleId;
+        });
+
+        // Map giá trị status dropdown sang text badge
+        var statusTextMap = {
+            "Pending": "chờ duyệt",
+            "Cancel": "từ chối",
+            "Done": "hoàn tất",
+            "": "" // tất cả
+        };
+
+        function filterTable() {
+            var license = document.getElementById('searchLicensePlate').value.toLowerCase();
+            var type = document.getElementById('searchVehicleType').value.toLowerCase();
+            var pkg = document.getElementById('searchPackageMonths').value.toLowerCase();
+            var start = document.getElementById('searchStartDate').value; // yyyy-MM-dd
+            var color = document.getElementById('searchColor').value.toLowerCase();
+            var statusDropdown = document.getElementById('searchStatus').value;
+            var status = statusTextMap[statusDropdown] ? statusTextMap[statusDropdown].toLowerCase() : "";
+
+            // Chuyển ngày từ input type="date" sang định dạng dd/MM/yyyy
+            var startFormatted = "";
+            if (start) {
+                var startParts = start.split('-'); // ["yyyy", "MM", "dd"]
+                startFormatted = startParts[2] + '/' + startParts[1] + '/' + startParts[0]; // "dd/MM/yyyy"
+            }
+
+            var table = document.getElementById('vehicleTable');
+            var trs = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (var i = 0; i < trs.length; i++) {
+                var tds = trs[i].getElementsByTagName('td');
+
+                var show =
+                    tds[0].innerText.toLowerCase().includes(license) &&
+                    tds[1].innerText.toLowerCase().includes(type) &&
+                    tds[2].innerText.toLowerCase().includes(pkg) &&
+                    (startFormatted === "" || tds[3].innerText === startFormatted) &&
+                    tds[4].innerText.toLowerCase().includes(color) &&
+                    (status === "" || tds[5].innerText.toLowerCase().includes(status));
+
+                trs[i].style.display = show ? '' : 'none';
+            }
+        }
+
+        // Event listener cho input text
+        document.getElementById('searchLicensePlate').addEventListener('keyup', filterTable);
+        document.getElementById('searchColor').addEventListener('keyup', filterTable);
+
+        // Event listener cho select/option
+        document.getElementById('searchVehicleType').addEventListener('change', filterTable);
+        document.getElementById('searchPackageMonths').addEventListener('change', filterTable);
+        document.getElementById('searchStatus').addEventListener('change', filterTable);
+
+        // Event listener cho input date
+        document.getElementById('searchStartDate').addEventListener('change', filterTable);
+    </script>
+}

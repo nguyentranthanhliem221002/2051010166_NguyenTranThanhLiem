@@ -58,9 +58,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IResidentRepository, ResidentRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IApartmentRepository, ApartmentRepository>();
+builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 
 // Cấu hình Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 {
     // Password policy (cho dev, production nên tăng cường)
     options.Password.RequireDigit = true;
@@ -91,7 +94,7 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
     // Tạo roles nếu chưa có
     string[] roles = { "Admin", "Manager", "User" };
@@ -107,10 +110,17 @@ using (var scope = app.Services.CreateScope())
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
     {
-        adminUser = new ApplicationUser
+        adminUser = new User
         {
             UserName = adminEmail,
             Email = adminEmail,
+            Address = "HCM",
+            DocumentNumber = "000000000001",
+            FullName = "Quản trị",
+            Sex = 0,
+            Position = "Admin",
+            IsResident = true,
+            CreatedDate = DateTime.Now,
             SecurityStamp = Guid.NewGuid().ToString() // Bắt buộc
         };
 
@@ -127,10 +137,17 @@ using (var scope = app.Services.CreateScope())
     var managerUser = await userManager.FindByEmailAsync(managerEmail);
     if (managerUser == null)
     {
-        managerUser = new ApplicationUser
+        managerUser = new User
         {
             UserName = managerEmail,
             Email = managerEmail,
+            Address = "HCM",
+            DocumentNumber = "000000000002",
+            FullName = "Nhân viên",
+            Sex = 1,
+            Position = "Manager",
+            CreatedDate = DateTime.Now,
+            IsResident = true,
             SecurityStamp = Guid.NewGuid().ToString()
         };
         var result = await userManager.CreateAsync(managerUser, managerPassword);
@@ -144,10 +161,17 @@ using (var scope = app.Services.CreateScope())
     var normalUser = await userManager.FindByEmailAsync(userEmail);
     if (normalUser == null)
     {
-        normalUser = new ApplicationUser
+        normalUser = new User
         {
             UserName = userEmail,
             Email = userEmail,
+            Address = "HCM",
+            DocumentNumber = "000000000003",
+            FullName = "NguyenVanA",
+            Sex = 1,
+            Position = "Resident",
+            IsResident = true,
+            CreatedDate = DateTime.Now,
             SecurityStamp = Guid.NewGuid().ToString()
         };
         var result = await userManager.CreateAsync(normalUser, userPassword);
@@ -159,6 +183,6 @@ using (var scope = app.Services.CreateScope())
 // Route mặc định
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

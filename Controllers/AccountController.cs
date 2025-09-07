@@ -6,13 +6,16 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-        public IActionResult Index()
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            return View();
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
+
+        public IActionResult Index() => View();
 
         [HttpGet]
         public IActionResult Login() => View();
@@ -32,26 +35,27 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
                 else if (roles.Contains("Manager"))
                     return RedirectToAction("Index", "Manager");
                 else
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Resident");
             }
 
             ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
             return View();
         }
-
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
         }
-
+      
         [HttpGet]
         public IActionResult Register() => View();
 
         [HttpPost]
         public async Task<IActionResult> Register(string email, string password, string role)
         {
-            var user = new ApplicationUser
+            var user = new User
             {
                 UserName = email,
                 Email = email

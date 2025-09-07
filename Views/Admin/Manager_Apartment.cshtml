@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "Apartment Page";
+    Layout = "_ManagerLayout";
+}
+@model ICollection<Apartment>
+
+<h2>Danh sách căn hộ</h2>
+
+<!-- Nút Thêm mới -->
+<a href="@Url.Action("CreateApartment", "Admin")" class="btn btn-primary mb-3">Thêm mới căn hộ</a>
+
+<table class="table" id="apartmentTable">
+    <thead>
+        <tr>
+            <th>Mã căn hộ</th>
+            <th>Tầng</th>
+            <th>Chủ sở hữu</th>
+        </tr>
+        <tr>
+            <!-- Hàng search -->
+            <th><input type="text" id="searchCode" class="form-control form-control-sm" placeholder="Tìm mã căn hộ" /></th>
+            <th><input type="text" id="searchFloor" class="form-control form-control-sm" placeholder="Tìm tầng" /></th>
+            <th><input type="text" id="searchOwner" class="form-control form-control-sm" placeholder="Tìm chủ sở hữu" /></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var apt in Model)
+        {
+            <tr oncontextmenu="showContextMenu(event, '@apt.Id')" data-id="@apt.Id">
+                <td>@apt.Code</td>
+                <td>@apt.Floor</td>
+                <td>@apt.Person?.FullName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Context menu -->
+<div id="contextMenu" style="position:absolute; display:none; background:#fff; border:1px solid #ccc; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+    <a href="#" id="updateLink" class="dropdown-item">Cập nhật</a>
+    <a href="#" id="deleteLink" class="dropdown-item text-danger">Xóa</a>
+</div>
+
+@section Scripts {
+    <script>
+        var currentApartmentId = null;
+
+        function showContextMenu(e, apartmentId) {
+            e.preventDefault();
+            currentApartmentId = apartmentId;
+
+            var menu = document.getElementById('contextMenu');
+            menu.style.top = e.pageY + 'px';
+            menu.style.left = e.pageX + 'px';
+            menu.style.display = 'block';
+        }
+
+        document.addEventListener('click', function () {
+            document.getElementById('contextMenu').style.display = 'none';
+        });
+
+        document.getElementById('updateLink').addEventListener('click', function () {
+            if (currentApartmentId)
+                window.location.href = '@Url.Action("EditApartment", "Admin")?id=' + currentApartmentId;
+        });
+
+        document.getElementById('deleteLink').addEventListener('click', function () {
+            if (!currentApartmentId) return;
+
+            if (confirm("Bạn có chắc chắn muốn xóa căn hộ này?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteApartment", "Admin")',
+                    type: 'POST',
+                    data: { id: currentApartmentId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                    success: function (response) {
+                        if (response.success) {
+                            $('tr[data-id="' + currentApartmentId + '"]').remove();
+                            currentApartmentId = null;
+                        } else {
+                            alert(response.message || "Xóa thất bại!");
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra!");
+                    }
+                });
+            }
+        });
+
+        // --- Filter Table ---
+        function filterApartmentTable() {
+            var code = document.getElementById('searchCode').value.toLowerCase();
+            var floor = document.getElementById('searchFloor').value.toLowerCase();
+            var owner = document.getElementById('searchOwner').value.toLowerCase();
+
+            var trs = document.getElementById('apartmentTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (var i = 0; i < trs.length; i++) {
+                var tds = trs[i].getElementsByTagName('td');
+                var show =
+                    tds[0].innerText.toLowerCase().includes(code) &&
+                    tds[1].innerText.toLowerCase().includes(floor) &&
+                    tds[2].innerText.toLowerCase().includes(owner);
+
+                trs[i].style.display = show ? '' : 'none';
+            }
+        }
+
+        // Event listener cho input
+        document.getElementById('searchCode').addEventListener('keyup', filterApartmentTable);
+        document.getElementById('searchFloor').addEventListener('keyup', filterApartmentTable);
+        document.getElementById('searchOwner').addEventListener('keyup', filterApartmentTable);
+    </script>
+}

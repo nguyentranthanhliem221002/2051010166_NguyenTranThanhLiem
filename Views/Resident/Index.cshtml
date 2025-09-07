@@ -1,0 +1,20 @@
+﻿@model _2051010166_NguyenTranThanhLiem.Models.User
+
+@{
+    ViewData["Title"] = "Resident Page";
+    Layout = "_ManagerLayout";
+}
+<div class="py-5">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Xin chào cư dân - @Model.FullName</h1>
+    </div>
+</div>
+<style>
+    body {
+        background-image: url('/images/background_manager.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover; /* hoặc contain nếu muốn vừa với màn hình */
+        background-attachment: fixed;
+    }
+</style>

@@ -2,8 +2,56 @@
     ViewData["Title"] = "About Page";
 }
 
-<div class="about">
-    <div class="text-center">
-        <h1>Trang giới thiệu</h1>
+<div class="about-page">
+    <div class="intro-box text-center">
+        <h1>Giới thiệu Chung cư SNAT</h1>
+        <p>
+            Chung cư SNAT tọa lạc tại vị trí đắc địa, mang đến không gian sống hiện đại, tiện nghi và an toàn cho cư dân.
+            Với thiết kế thông minh, dịch vụ đầy đủ và cộng đồng văn minh, SNAT là lựa chọn lý tưởng để sinh sống và nghỉ dưỡng.
+        </p>
+        <p>
+            Chúng tôi cung cấp các tiện ích như bãi đỗ xe, dịch vụ bảo trì, điện nước đầy đủ, wifi tốc độ cao, và nhiều dịch vụ tiện ích khác.
+            Mục tiêu của chúng tôi là đem đến một môi trường sống thoải mái, xanh sạch và thân thiện cho mọi cư dân.
+        </p>
     </div>
 </div>
+
+<style>
+    body {
+        background-image: url('/images/banner_viewChungCu.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        font-family: 'Times New Roman', Times, serif;
+        color: white;
+    }
+
+    .about-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .intro-box {
+        background-color: rgba(0, 0, 0, 0.6); /* nền bán trong suốt để nổi trên background */
+        border-radius: 15px;
+        padding: 40px 30px;
+        max-width: 800px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+        .intro-box h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            color: #0d6efd; /* màu xanh nổi bật */
+        }
+
+        .intro-box p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+</style>

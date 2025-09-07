@@ -2,39 +2,163 @@
     ViewData["Title"] = "Sidebar";
 }
 
-@{
-    ViewData["Title"] = "Sidebar";
-}
-
 <div class="sidebar p-3">
     <ul class="nav flex-column text-center">
-        <!-- Logo -->
-        <li class="nav-item mb-4">
-            <a class="nav-link fw-bold fs-4" asp-controller="Admin" asp-action="Index">
-                LOGO
+
+        @if (User.IsInRole("Admin"))
+        {
+            <!-- Logo Admin -->
+            <li class="nav-item mb-4">
+                <a class="nav-link fw-bold fs-4" asp-controller="Admin" asp-action="Index">
+                    <img src="./images/Logo_SNAT.jpg" style="width:60px; height:60px;" /> 
+                </a>
+                <h3 class="text-white fw-bold">Quản trị</h3>
+            </li>
+
+            <!-- Menu Admin -->
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Apartment">
+                    Quản lý căn hộ
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Resident">
+                    Quản lý cư dân
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Employee">
+                    Quản lý nhân sự
+                </a>
+            </li>
+
+            <!-- Collapse menu Quản lý dịch vụ -->
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" data-bs-toggle="collapse" href="#serviceAdminMenu" role="button" aria-expanded="false" aria-controls="serviceAdminMenu">
+                    Quản lý dịch vụ
+                </a>
+                <div class="collapse" id="serviceAdminMenu">
+                    <ul class="nav flex-column ms-3">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Maintenance">
+                                🛠 Bảo trì
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Vehicle">
+                                🚗 Bãi xe
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Electricity">
+                                ⚡ Điện
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Water">
+                                💧 Nước
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Wifi">
+                                📶 Wifi
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Statistical">
+                    Thống kê/ Báo cáo
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="SystemSetting">
+                    Cài đặt
+                </a>
+            </li>
+        }
+        else if (User.IsInRole("User"))
+        {
+            <!-- Logo Resident -->
+            <li class="nav-item mb-4">
+                <a class="nav-link fw-bold fs-4" asp-controller="Resident" asp-action="Index">
+                    <img src="./images/Logo_SNAT.jpg" style="width:60px; height:60px;" />
+                </a>
+                <h3 class="text-white fw-bold">Cư dân</h3>
+            </li>
+
+            <!-- Menu Resident -->
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" data-bs-toggle="collapse" href="#servicesMenu" role="button" aria-expanded="false" aria-controls="servicesMenu">
+                    🛎 Dịch vụ
+                </a>
+                <div class="collapse" id="servicesMenu">
+                    <ul class="nav flex-column ms-3">
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Vehicles">
+                                🚗 Đăng ký xe tháng
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Electricity">
+                                ⚡ Điện
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Water">
+                                💧 Nước
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Cleaning">
+                                🧹 Vệ sinh
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Maintenance">
+                                🛠 Bảo trì
+                            </a>
+                        </li>
+                        <li class="nav-item mb-1">
+                            <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Wifi">
+                                📶 Wifi
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
+            <!-- Các menu khác -->
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Payment">
+                    💳 Thanh toán hóa đơn
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Infomation">
+                    👤 Thông tin cá nhân
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Complain">
+                    📝 Phản ánh / Kiến nghị
+                </a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link sidebar-link" asp-controller="Resident" asp-action="Booking">
+                    📅 Đặt lịch tiện ích
+                </a>
+            </li>
+        }
+
+        <li class="nav-item mb-3">
+            <a class="nav-link sidebar-link" asp-controller="Home" asp-action="Index">
+                🏠 Trang chủ
             </a>
         </li>
 
-        <!-- Menu Items -->
-        <li class="nav-item mb-2">
-            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Apartment">
-                Quản lý căn hộ
-            </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Resident">
-                Quản lý cư dân
-            </a>
-        </li>
-        <li class="nav-item mb-2">
-            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Employee">
-                Quản lý nhân viên
-            </a>
-        </li>
-        <li class="nav-item mt-3">
-            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Setting">
-                Cài đặt
-            </a>
-        </li>
     </ul>
+
 </div>

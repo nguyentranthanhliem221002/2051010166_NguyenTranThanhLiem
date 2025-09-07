@@ -18,27 +18,51 @@ namespace _2051010166_NguyenTranThanhLiem
 
 
     //}
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<Person> Persons { get; set; }
-        public DbSet<Employee> Employees { get; set; }
         public DbSet<Apartment> Apartments { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<VehicleType> VehicleTypes { get; set; }
+        public DbSet<ApartmentInfo> ApartmentInfos { get; set; }
+        public DbSet<SystemSetting> SystemSettings { get; set; }
+
         public DbSet<Invoice> Invoices { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(modelBuilder);
 
-            // Quan hệ 1-1 giữa ApplicationUser và Person
-            builder.Entity<ApplicationUser>()
-                .HasOne(u => u.Person)
-                .WithOne()
-                .HasForeignKey<ApplicationUser>(u => u.PersonId)
-                .OnDelete(DeleteBehavior.SetNull);
+            // User <-> Vehicle
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(v => v.Person)
+                .WithMany(u => u.Vehicles)
+                .HasForeignKey(v => v.PersonId)
+                .OnDelete(DeleteBehavior.Restrict); // không xóa user -> xóa vehicle
+
+            // Apartment <-> Vehicle
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(v => v.Apartment)
+                .WithMany(a => a.Vehicles)
+                .HasForeignKey(v => v.ApartmentId)
+                .OnDelete(DeleteBehavior.Cascade); // xóa Apartment -> xóa tất cả Vehicle
+
+            // VehicleType <-> Vehicle
+            modelBuilder.Entity<Vehicle>()
+                .HasOne(v => v.VehicleType)
+                .WithMany(vt => vt.Vehicles)
+                .HasForeignKey(v => v.VehicleTypeId)
+                .OnDelete(DeleteBehavior.Restrict); // loại xe vẫn tồn tại
+
+            // Apartment <-> User
+            modelBuilder.Entity<Apartment>()
+                .HasOne(a => a.Person)
+                .WithMany(u => u.Apartments)
+                .HasForeignKey(a => a.PersonId)
+                .OnDelete(DeleteBehavior.Restrict); // không xóa user khi xóa apartment
         }
+
     }
 }

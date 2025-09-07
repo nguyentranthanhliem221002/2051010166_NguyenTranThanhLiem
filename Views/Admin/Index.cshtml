@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Manager Page";
-    Layout = null;
+    Layout = "_ManagerLayout";
 }
 
 <!DOCTYPE html>
@@ -12,16 +12,24 @@
     <link href="~/css/root.css" rel="stylesheet" />
 </head>
 <body>
-    <div class="row">
-        <div class=" col-md-2">@await Html.PartialAsync("_SideBar")</div>
 
+  
         <div class="col-md-10 text-center">
 
-            <h1>Trang quản trị</h1>
+            <h1><strong>Trang quản trị</strong></h1>
         </div>
-    </div>
+
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<style>
+    body {
+        background-image: url('/images/background_manager.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover; /* hoặc contain nếu muốn vừa với màn hình */
+        background-attachment: fixed;
+    }
+</style>

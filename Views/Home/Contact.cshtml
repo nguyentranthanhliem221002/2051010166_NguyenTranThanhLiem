@@ -2,8 +2,101 @@
     ViewData["Title"] = "Contact Page";
 }
 
-<div class="contact">
-    <div class="text-center">
+<div class="contact-page">
+    <div class="contact-box text-center">
         <h1>Trang liên hệ</h1>
+
+        <!-- Mạng xã hội -->
+        <div class="social-icons mt-4">
+            <a href="https://www.facebook.com/" target="_blank" class="social-link">
+                <i class="bi bi-facebook"></i> Facebook
+            </a>
+            <a href="https://www.tiktok.com/" target="_blank" class="social-link">
+                <i class="bi bi-tiktok"></i> TikTok
+            </a>
+            <a href="https://zalo.me/" target="_blank" class="social-link">
+                <i class="bi bi-phone"></i> Zalo
+            </a>
+            <a href="https://www.instagram.com/" target="_blank" class="social-link">
+                <i class="bi bi-instagram"></i> Instagram
+            </a>
+            <a href="https://twitter.com/" target="_blank" class="social-link">
+                <i class="bi bi-x"></i> X
+            </a>
+            <span class="social-link">
+                <i class="bi bi-telephone"></i> 0123-456-789
+            </span>
+        </div>
     </div>
 </div>
+
+<style>
+    body {
+        background-image: url('/images/banner_viewChungCu.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        font-family: 'Times New Roman', Times, serif;
+        color: white;
+        margin: 0;
+    }
+
+    /* Wrapper căn giữa toàn trang */
+    .contact-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Khối nổi bật */
+    .contact-box {
+        background-color: rgba(0,0,0,0.6); /* nền bán trong suốt */
+        border-radius: 15px;
+        padding: 40px 30px;
+        max-width: 800px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+        /* Tiêu đề */
+        .contact-box h1 {
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #0d6efd; /* màu xanh nổi bật */
+        }
+
+    /* Social icons */
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .social-link {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 10px 15px;
+        border: 2px solid rgba(255,255,255,0.7);
+        border-radius: 12px;
+        background-color: rgba(0,0,0,0.5);
+        color: white;
+        font-size: 1.2rem;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+        .social-link i {
+            font-size: 1.5rem;
+        }
+
+        .social-link:hover {
+            color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.2);
+            border-color: #0d6efd;
+            transform: translateY(-3px);
+        }
+</style>

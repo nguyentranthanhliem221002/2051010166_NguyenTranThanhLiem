@@ -1,0 +1,200 @@
+﻿@model _2051010166_NguyenTranThanhLiem.ViewModels.SettingPageViewModel
+@{
+    ViewData["Title"] = "SystemSetting Page";
+    Layout = "_ManagerLayout";
+}
+
+<div class="container-fluid mt-4">
+    <div class="text-center mb-4">
+        <h1>Cài đặt chung</h1>
+    </div>
+
+    <!-- Thông tin chung cư -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Thông tin chung cư</h5>
+        </div>
+        <div class="card-body">
+            <form id="apartmentForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tên chung cư</label>
+                        <input type="text" class="form-control" name="Name" value="@(Model.Apartment?.Name ?? "")" placeholder="Nhập tên chung cư" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" name="Address" value="@(Model.Apartment?.Address ?? "")" placeholder="Nhập địa chỉ" />
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" name="Phone" value="@(Model.Apartment?.Phone ?? "")" placeholder="Nhập số điện thoại" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Email liên hệ</label>
+                        <input type="email" class="form-control" name="Email" value="@(Model.Apartment?.Email ?? "")" placeholder="Nhập email" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Logo</label>
+                        <input type="file" class="form-control" name="Logo" />
+                        @if(!string.IsNullOrEmpty(Model.Apartment?.LogoUrl))
+                        {
+                            <img src="@Model.Apartment.LogoUrl" alt="Logo" class="mt-2" style="height:50px;" />
+                        }
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" id="saveApartmentBtn">Lưu thông tin</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quản lý vai trò & người dùng -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Quản lý vai trò & người dùng</h5>
+        </div>
+        <div class="card-body">
+            <button class="btn btn-success mb-3" id="addUserBtn">Thêm người dùng mới</button>
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Vai trò</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if(Model.Users != null)
+                    {
+                        foreach(var user in Model.Users)
+                        {
+                            <tr data-id="@user.Id">
+                                <td>@user.FullName</td>
+                                <td>@user.Email</td>
+                                <td>@user.Role</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm me-1 editUserBtn">Sửa</button>
+                                    <button class="btn btn-danger btn-sm deleteUserBtn">Xóa</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cấu hình hệ thống -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Cấu hình hệ thống</h5>
+        </div>
+        <div class="card-body">
+            <form id="systemSettingForm">
+                <div class="mb-3">
+                    <label class="form-label">Thông báo qua email</label>
+                    <select class="form-select" name="EmailNotification">
+                        @if (Model.Setting?.EmailNotification == true)
+                        {
+                            <option value="true" selected>Bật</option>
+                            <option value="false">Tắt</option>
+                        }
+                        else
+                        {
+                            <option value="true">Bật</option>
+                            <option value="false" selected>Tắt</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Thông báo qua SMS</label>
+                    <select class="form-select" name="SmsNotification">
+                        @if (Model.Setting?.SmsNotification == true)
+                        {
+                            <option value="true" selected>Bật</option>
+                            <option value="false">Tắt</option>
+                        }
+                        else
+                        {
+                            <option value="true">Bật</option>
+                            <option value="false" selected>Tắt</option>
+                        }
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" id="saveSettingBtn">Lưu cấu hình</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // --- Lưu thông tin chung cư ---
+        document.getElementById('saveApartmentBtn').addEventListener('click', function () {
+            var formData = new FormData(document.getElementById('apartmentForm'));
+            $.ajax({
+                url: '@Url.Action("SaveApartmentInfo", "Admin")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(resp) {
+                    alert(resp.message || "Lưu thông tin thành công!");
+                },
+                error: function() {
+                    alert("Có lỗi xảy ra khi lưu thông tin!");
+                }
+            });
+        });
+
+        // --- Thêm người dùng ---
+        document.getElementById('addUserBtn').addEventListener('click', function () {
+            window.location.href = '@Url.Action("CreateUser", "Admin")';
+        });
+
+        // --- Sửa/Xóa người dùng ---
+        document.querySelectorAll('.editUserBtn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                var userId = this.closest('tr').dataset.id;
+                window.location.href = '@Url.Action("EditUser", "Admin")?id=' + userId;
+            });
+        });
+
+        document.querySelectorAll('.deleteUserBtn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                var userId = this.closest('tr').dataset.id;
+                if(confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+                    $.ajax({
+                        url: '@Url.Action("DeleteUser", "Admin")',
+                        type: 'POST',
+                        data: { id: userId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                        success: function(resp){
+                            if(resp.success){
+                                document.querySelector('tr[data-id="'+userId+'"]').remove();
+                            } else {
+                                alert(resp.message || "Xóa thất bại!");
+                            }
+                        },
+                        error: function(){ alert("Có lỗi xảy ra!"); }
+                    });
+                }
+            });
+        });
+
+        // --- Lưu cấu hình hệ thống ---
+        document.getElementById('saveSettingBtn').addEventListener('click', function () {
+            var formData = $('#systemSettingForm').serialize();
+            $.ajax({
+                url: '@Url.Action("SaveSystemSetting", "Admin")',
+                type: 'POST',
+                data: formData,
+                success: function(resp){
+                    alert(resp.message || "Lưu cấu hình thành công!");
+                },
+                error: function(){ alert("Có lỗi xảy ra khi lưu cấu hình!"); }
+            });
+        });
+    </script>
+}

@@ -14,31 +14,33 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
         }
 
         // Lấy tất cả nhân viên
-        public ICollection<Employee> GetEmployees()
+        public ICollection<User> GetEmployees()
         {
-            return _context.Employees
-                           .Where(x => x.Status >= 0 && x.Position != null)
+            return _context.Users
+                           .Where(x => x.Status >= 0 && x.Position == "Manager")
+                           .OrderByDescending(x => x.CreatedDate)
                            .ToList();
         }
 
         // Lấy nhân viên theo Id
-        public Employee GetEmployeeById(Guid id)
+        public User GetEmployeeById(Guid id)
         {
-            return _context.Employees.FirstOrDefault(x => x.Id == id && x.Position != null);
+            return _context.Users.FirstOrDefault(x => x.Id == id && x.Position != null);
         }
 
         // Thêm nhân viên mới
-        public void AddEmployee(Employee employee)
+        public void AddEmployee(User employee)
         {
             employee.Status = 0;        // mặc định trạng thái active
-            _context.Employees.Add(employee);
+            employee.CreatedDate = DateTime.Now;
+            _context.Users.Add(employee);
             _context.SaveChanges();
         }
 
         // Cập nhật thông tin nhân viên
-        public void UpdateEmployee(Employee employee)
+        public void UpdateEmployee(User employee)
         {
-            var existing = _context.Employees.FirstOrDefault(x => x.Id == employee.Id && x.Position != null);
+            var existing = _context.Users.FirstOrDefault(x => x.Id == employee.Id && x.Position != null);
             if (existing != null)
             {
                 existing.FullName = employee.FullName;
@@ -53,15 +55,17 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             }
         }
 
-        // Xóa nhân viên (chỉ đánh dấu Status = -1)
-        public void DeleteEmployee(Guid id)
+        public bool DeleteEmployee(Guid id)
         {
-            var employee = _context.Employees.FirstOrDefault(x => x.Id == id && x.Position != null);
+            var employee = _context.Users.FirstOrDefault(x => x.Id == id && x.Position != null);
             if (employee != null)
             {
-                employee.Status = -1; // đánh dấu đã xóa
+                employee.Status = -1; 
                 _context.SaveChanges();
+                return true; 
             }
+            return false; 
         }
+
     }
 }

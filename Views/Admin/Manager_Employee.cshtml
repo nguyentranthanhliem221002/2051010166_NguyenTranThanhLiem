@@ -1,0 +1,171 @@
+﻿@{
+    ViewData["Title"] = "Employee Page";
+    Layout = "_ManagerLayout";
+}
+@model ICollection<User>
+
+<h2>Danh sách nhân viên</h2>
+
+<!-- Nút Thêm mới nhân viên -->
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createEmployeeModal">
+    Thêm mới nhân viên
+</button>
+
+
+
+<table class="table" id="employeeTable">
+    <thead>
+        <tr>
+            <th>Họ và tên</th>
+            <th>Số CMND/CCCD</th>
+            <th>Địa chỉ</th>
+            <th>Email</th>
+            <th>Số điện thoại</th>
+            <th>Giới tính</th>
+            <th>Chức vụ</th>
+        </tr>
+        <tr>
+            <!-- Hàng search -->
+            <th><input type="text" id="searchFullName" class="form-control form-control-sm" placeholder="Tìm họ tên" /></th>
+            <th><input type="text" id="searchDocumentNumber" class="form-control form-control-sm" placeholder="Tìm CMND" /></th>
+            <th><input type="text" id="searchAddress" class="form-control form-control-sm" placeholder="Tìm địa chỉ" /></th>
+            <th><input type="text" id="searchEmail" class="form-control form-control-sm" placeholder="Tìm email" /></th>
+            <th><input type="text" id="searchPhoneNumber" class="form-control form-control-sm" placeholder="Tìm số điện thoại" /></th>
+            <th>
+                <select id="searchSex" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Nam">Nam</option>
+                </select>
+            </th>
+            <th>
+                <select id="searchPosition" class="form-select form-select-sm">
+                    <option value="">Tất cả</option>
+                    @foreach (var pos in Model.Select(e => e.Position).Distinct())
+                    {
+                        <option value="@pos">@pos</option>
+                    }
+                </select>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            <tr oncontextmenu="showContextMenu(event, '@employee.Id')" data-id="@employee.Id">
+                <td>@employee.FullName</td>
+                <td>@employee.DocumentNumber</td>
+                <td>@employee.Address</td>
+                <td>@employee.Email</td>
+                <td>@employee.PhoneNumber</td>
+                <td>@(employee.Sex == 0 ? "Nữ" : "Nam")</td>
+                <td>@employee.Position</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="modal fade" id="createEmployeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm nhân viên mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("Partials/_CreateEmployee", new _2051010166_NguyenTranThanhLiem.Models.User())
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Context menu -->
+<div id="contextMenu" style="position:absolute; display:none; background:#fff; border:1px solid #ccc; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
+    <a href="#" id="updateLink" class="dropdown-item">Cập nhật</a>
+    <a href="#" id="deleteLink" class="dropdown-item text-danger">Xóa</a>
+</div>
+
+@section Scripts {
+    <script>
+        var currentEmployeeId = null;
+
+        function showContextMenu(e, employeeId) {
+            e.preventDefault();
+            currentEmployeeId = employeeId;
+
+            var menu = document.getElementById('contextMenu');
+            menu.style.top = e.pageY + 'px';
+            menu.style.left = e.pageX + 'px';
+            menu.style.display = 'block';
+        }
+
+        document.addEventListener('click', function () {
+            document.getElementById('contextMenu').style.display = 'none';
+        });
+
+        document.getElementById('updateLink').addEventListener('click', function () {
+            if (currentEmployeeId)
+                window.location.href = '@Url.Action("EditEmployee", "Admin")?id=' + currentEmployeeId;
+        });
+
+        document.getElementById('deleteLink').addEventListener('click', function () {
+            if (!currentEmployeeId) return;
+
+            if (confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
+                $.ajax({
+                    url: '@Url.Action("DeleteEmployee", "Admin")',
+                    type: 'POST',
+                    data: { id: currentEmployeeId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                    success: function (response) {
+                        if (response.success) {
+                            $('tr[data-id="' + currentEmployeeId + '"]').remove();
+                            currentEmployeeId = null;
+                        } else {
+                            alert(response.message || "Xóa thất bại!");
+                        }
+                    },
+                    error: function () {
+                        alert("Có lỗi xảy ra!");
+                    }
+                });
+            }
+        });
+
+        // --- Filter Table ---
+        function filterEmployeeTable() {
+            var fullName = document.getElementById('searchFullName').value.toLowerCase();
+            var docNum = document.getElementById('searchDocumentNumber').value.toLowerCase();
+            var address = document.getElementById('searchAddress').value.toLowerCase();
+            var email = document.getElementById('searchEmail').value.toLowerCase();
+            var phone = document.getElementById('searchPhoneNumber').value.toLowerCase();
+            var sex = document.getElementById('searchSex').value;
+            var position = document.getElementById('searchPosition').value;
+
+            var trs = document.getElementById('employeeTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+            for (var i = 0; i < trs.length; i++) {
+                var tds = trs[i].getElementsByTagName('td');
+                var show =
+                    tds[0].innerText.toLowerCase().includes(fullName) &&
+                    tds[1].innerText.toLowerCase().includes(docNum) &&
+                    tds[2].innerText.toLowerCase().includes(address) &&
+                    tds[3].innerText.toLowerCase().includes(email) &&
+                    tds[4].innerText.toLowerCase().includes(phone) &&
+                    (sex === "" || tds[5].innerText === sex) &&
+                    (position === "" || tds[6].innerText === position);
+
+                trs[i].style.display = show ? '' : 'none';
+            }
+        }
+
+        // Event listener cho input
+        document.getElementById('searchFullName').addEventListener('keyup', filterEmployeeTable);
+        document.getElementById('searchDocumentNumber').addEventListener('keyup', filterEmployeeTable);
+        document.getElementById('searchAddress').addEventListener('keyup', filterEmployeeTable);
+        document.getElementById('searchEmail').addEventListener('keyup', filterEmployeeTable);
+        document.getElementById('searchPhoneNumber').addEventListener('keyup', filterEmployeeTable);
+
+        // Event listener cho select
+        document.getElementById('searchSex').addEventListener('change', filterEmployeeTable);
+        document.getElementById('searchPosition').addEventListener('change', filterEmployeeTable);
+    </script>
+}

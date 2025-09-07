@@ -12,7 +12,7 @@
     <title>@ViewData["Title"]</title>
 </head>
 <body>
-    <div class="row">
+@*     <div class="row">
         <div class="col-md-3">
             @await Html.PartialAsync("_SideBar")
         </div>
@@ -21,8 +21,28 @@
             @RenderBody()
         </div>
     </div>
+ *@
+    <div class="row full-height-row">
+        <div class="col-md-3 sidebar">
+            @await Html.PartialAsync("_SideBar")
+        </div>
+        <div class="col-md-9 main-content">
+            @RenderBody()
+        </div>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
+
+<style>
+    body {
+        background-image: url('/images/background_manager.jpg');
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover; /* hoặc contain nếu muốn vừa với màn hình */
+        background-attachment: fixed;
+    }
+</style>
