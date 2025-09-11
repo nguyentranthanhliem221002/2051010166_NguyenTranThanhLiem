@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\Employee.cs" />
+    <Compile Remove="Models\Person.cs" />
     <Compile Remove="Models\Role.cs" />
   </ItemGroup>
 
@@ -22,7 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
+    <Content Update="Views\Resident\Vehicles.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

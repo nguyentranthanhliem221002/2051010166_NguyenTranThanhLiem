@@ -46,6 +46,7 @@ using _2051010166_NguyenTranThanhLiem.Models;
 using _2051010166_NguyenTranThanhLiem.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,13 +91,13 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Seed roles & admin user
+// Seed roles & users mặc định
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-    // Tạo roles nếu chưa có
+    // Danh sách role mặc định
     string[] roles = { "Admin", "Manager", "User" };
     foreach (var role in roles)
     {
@@ -104,80 +105,65 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole<Guid>(role));
     }
 
-    // Tạo Admin user nếu chưa có
-    string adminEmail = "admin@example.com";
-    string adminPassword = "Admin@123"; // Password đủ mạnh
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-    if (adminUser == null)
+    // Hàm tạo user chung có giới tính
+    async Task SeedUserAsync(string email, string password, string fullName, string phoneNumber, string position, string role, bool isResident, int sex)
     {
-        adminUser = new User
+        var existingUser = await userManager.FindByEmailAsync(email);
+        if (existingUser == null)
         {
-            UserName = adminEmail,
-            Email = adminEmail,
-            Address = "HCM",
-            DocumentNumber = "000000000001",
-            FullName = "Quản trị",
-            Sex = 0,
-            Position = "Admin",
-            IsResident = true,
-            CreatedDate = DateTime.Now,
-            SecurityStamp = Guid.NewGuid().ToString() // Bắt buộc
-        };
+            var random = new Random();
 
-        var result = await userManager.CreateAsync(adminUser, adminPassword);
-        if (result.Succeeded)
-        {
-            await userManager.AddToRoleAsync(adminUser, "Admin");
+            var newUser = new User
+            {
+                UserName = email,
+                Email = email,
+                FullName = fullName,
+                Address = "HCM",
+                DocumentNumber = "0" + string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10).ToString())),
+                Sex = sex, // 1 = Nam, 0 = Nữ
+                Position = position,
+                IsResident = isResident,
+                PhoneNumber = phoneNumber,
+                Status = 1, // 1 = active
+                CreatedDate = DateTime.Now,
+                SecurityStamp = Guid.NewGuid().ToString()
+            };
+
+            var result = await userManager.CreateAsync(newUser, password);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(newUser, role);
+            }
+            else
+            {
+                throw new Exception($"Seed user {email} thất bại: " +
+                    string.Join("; ", result.Errors.Select(e => e.Description)));
+            }
         }
     }
 
-    // Tạo Manager
-    string managerEmail = "manager@example.com";
-    string managerPassword = "Manager@123";
-    var managerUser = await userManager.FindByEmailAsync(managerEmail);
-    if (managerUser == null)
-    {
-        managerUser = new User
-        {
-            UserName = managerEmail,
-            Email = managerEmail,
-            Address = "HCM",
-            DocumentNumber = "000000000002",
-            FullName = "Nhân viên",
-            Sex = 1,
-            Position = "Manager",
-            CreatedDate = DateTime.Now,
-            IsResident = true,
-            SecurityStamp = Guid.NewGuid().ToString()
-        };
-        var result = await userManager.CreateAsync(managerUser, managerPassword);
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(managerUser, "Manager");
-    }
+    // --- Tạo Admin
+    await SeedUserAsync("admin@example.com", "Admin@123", "Quản trị", "0909000001", "Admin", "Admin", false, 1);
 
-    // Tạo User bình thường
-    string userEmail = "user@example.com";
-    string userPassword = "User@123";
-    var normalUser = await userManager.FindByEmailAsync(userEmail);
-    if (normalUser == null)
-    {
-        normalUser = new User
-        {
-            UserName = userEmail,
-            Email = userEmail,
-            Address = "HCM",
-            DocumentNumber = "000000000003",
-            FullName = "NguyenVanA",
-            Sex = 1,
-            Position = "Resident",
-            IsResident = true,
-            CreatedDate = DateTime.Now,
-            SecurityStamp = Guid.NewGuid().ToString()
-        };
-        var result = await userManager.CreateAsync(normalUser, userPassword);
-        if (result.Succeeded)
-            await userManager.AddToRoleAsync(normalUser, "User");
-    }
+    // --- Tạo Manager
+    await SeedUserAsync("manager@example.com", "Manager@123", "Nhân viên quản lý", "0909000002", "Manager", "Manager", false, 1);
+
+    // --- 4 nhân viên
+    await SeedUserAsync("guard@example.com", "Employee@123", "Bảo vệ 1", "0901000001", "Bảo vệ", "User", false, 1);
+    await SeedUserAsync("reception@example.com", "Employee@123", "Lễ tân 1", "0901000002", "Lễ tân", "User", false, 0);
+    await SeedUserAsync("maintenance@example.com", "Employee@123", "Bảo trì 1", "0901000003", "Bảo trì", "User", false, 1);
+    await SeedUserAsync("cleaning@example.com", "Employee@123", "Lao công 1", "0901000004", "Lao công", "User", false, 0);
+
+    // --- 5 cư dân
+    await SeedUserAsync("resident1@example.com", "Resident@123", "Nguyen Van A", "0911000001", "", "User", true, 1);
+    await SeedUserAsync("resident2@example.com", "Resident@123", "Nguyen Van B", "0911000002", "", "User", true, 1);
+    await SeedUserAsync("resident3@example.com", "Resident@123", "Tran Thi C", "0911000003", "", "User", true, 0);
+    await SeedUserAsync("resident4@example.com", "Resident@123", "Le Van D", "0911000004", "", "User", true, 1);
+    await SeedUserAsync("resident5@example.com", "Resident@123", "Pham Thi E", "0911000005", "", "User", true, 0);
+
+
+
+
 }
 
 // Route mặc định

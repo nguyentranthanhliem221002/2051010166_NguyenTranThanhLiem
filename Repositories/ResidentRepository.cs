@@ -1,25 +1,26 @@
 ﻿using _2051010166_NguyenTranThanhLiem.Interfaces;
 using _2051010166_NguyenTranThanhLiem.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace _2051010166_NguyenTranThanhLiem.Repositories
 {
     public class ResidentRepository : IResidentRepository
     {
-
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public ResidentRepository(ApplicationDbContext context)
+        public ResidentRepository(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public ICollection<User> GetResidents()
         {
             return _context.Users
                 .Where(x => x.Status >= 0 && x.IsResident && x.Position == "")
-                .OrderByDescending(x => x.CreatedDate) // hoặc x.Id
+                .OrderByDescending(x => x.CreatedDate)
                 .ToList();
-
         }
 
         public User GetResidentById(Guid id)
@@ -27,13 +28,35 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             return _context.Users.FirstOrDefault(x => x.Id == id && x.IsResident);
         }
 
-
-        public void AddResident(User resident)
+        public async Task AddResidentAsync(User resident)
         {
-            resident.IsResident = true; // chắc chắn là cư dân
+            // Kiểm tra user trùng
+            if (await _userManager.FindByEmailAsync(resident.Email) != null)
+                throw new Exception("Email đã tồn tại.");
+
+            // Khởi tạo các trường bắt buộc
+            resident.Id = Guid.NewGuid();
+            resident.IsResident = true;
             resident.CreatedDate = DateTime.Now;
-            _context.Users.Add(resident);
-            _context.SaveChanges();
+            resident.UpdatedDate = DateTime.Now;
+            resident.UserName = resident.Email;
+            resident.Position ??= "";
+            resident.CreatedBy = Guid.NewGuid();  
+            resident.UpdatedBy = Guid.NewGuid();
+            resident.SecurityStamp = Guid.NewGuid().ToString();
+            resident.Status = 1;
+
+            string defaultPassword = "Resident@123";
+
+            var result = await _userManager.CreateAsync(resident, defaultPassword);
+            if (!result.Succeeded)
+            {
+                throw new Exception("Tạo resident thất bại: " +
+                    string.Join("; ", result.Errors.Select(e => e.Description)));
+            }
+
+            // Thêm role
+            await _userManager.AddToRoleAsync(resident, "User");
         }
 
         public void UpdateResident(User resident)
@@ -47,6 +70,7 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                 existing.Email = resident.Email;
                 existing.PhoneNumber = resident.PhoneNumber;
                 existing.Sex = resident.Sex;
+                existing.Position = resident.Position;
                 existing.Status = resident.Status;
                 existing.UpdatedDate = resident.UpdatedDate;
                 _context.SaveChanges();
@@ -67,12 +91,8 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
 
         public Guid GetPersonIdByUserId(Guid userId)
         {
-            // Tìm personId dựa vào UserId
             var person = _context.Users.FirstOrDefault(p => p.Id == userId);
-            if (person == null) return Guid.Empty;
-
-            return person.Id; // Id chính là PersonId
+            return person?.Id ?? Guid.Empty;
         }
-
     }
 }

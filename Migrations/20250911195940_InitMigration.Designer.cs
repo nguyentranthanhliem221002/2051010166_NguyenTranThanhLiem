@@ -12,8 +12,8 @@ using _2051010166_NguyenTranThanhLiem;
 namespace _2051010166_NguyenTranThanhLiem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250907164541_CreateMigration")]
-    partial class CreateMigration
+    [Migration("20250911195940_InitMigration")]
+    partial class InitMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

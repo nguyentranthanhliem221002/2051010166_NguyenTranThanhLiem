@@ -6,7 +6,7 @@ namespace _2051010166_NguyenTranThanhLiem.Interfaces
     {
         ICollection<User> GetEmployees();
         User GetEmployeeById(Guid id);
-        void AddEmployee(User employee);
+        Task AddEmployeeAsync(User employee);
         void UpdateEmployee(User employee);
         bool DeleteEmployee(Guid id);
     }

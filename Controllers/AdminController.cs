@@ -89,17 +89,20 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateEmployee(User employee)
+        public async Task<IActionResult> CreateEmployee(User employee)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _employeeRepository.AddEmployee(employee);
-                return RedirectToAction("Employee");
-            }
+                await _employeeRepository.AddEmployeeAsync(employee);
 
-            var employees = _employeeRepository.GetEmployees();
-            ViewData["NewEmployee"] = employee; // giữ dữ liệu nhập
-            return View("Manager_Employee", employees);
+                TempData["SuccessMessage"] = "Thêm nhân viên thành công!";
+                return RedirectToAction("Manager_Employee"); // quay về danh sách nhân viên
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View("Manager_Employee", _employeeRepository.GetEmployees());
+            }
         }
 
         [HttpPost]
@@ -122,18 +125,23 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
         // Thêm Resident
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateResident(User resident)
+        public async Task<IActionResult> CreateResident(User resident)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _residentRepository.AddResident(resident);
-                return RedirectToAction("Resident"); 
-            }
+      
+                await _residentRepository.AddResidentAsync(resident);
 
-            var residents = _residentRepository.GetResidents();
-            ViewData["NewResident"] = resident;
-            return View("Resident", residents);
+                TempData["SuccessMessage"] = "Thêm cư dân thành công!";
+                return RedirectToAction("Manager_Resident"); // quay về danh sách cư dân
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View("Manager_Resident", _residentRepository.GetResidents());
+            }
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

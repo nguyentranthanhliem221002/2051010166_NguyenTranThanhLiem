@@ -6,7 +6,7 @@ namespace _2051010166_NguyenTranThanhLiem.Interfaces
     {
         ICollection<User> GetResidents();
         User GetResidentById(Guid id);
-        void AddResident(User resident);
+        Task AddResidentAsync(User resident);
         void UpdateResident(User resident);
         bool DeleteResident(Guid id);
         Guid GetPersonIdByUserId(Guid userId);

@@ -20,7 +20,6 @@
             <th>Email</th>
             <th>Số điện thoại</th>
             <th>Giới tính</th>
-            <th>Chức vụ</th> <!-- nếu muốn giống Employee -->
         </tr>
         <tr>
             <!-- Hàng search -->
@@ -30,21 +29,14 @@
             <th><input type="text" id="searchEmail" class="form-control form-control-sm" placeholder="Tìm email" /></th>
             <th><input type="text" id="searchPhoneNumber" class="form-control form-control-sm" placeholder="Tìm số điện thoại" /></th>
             <th>
-                <select id="searchSex" class="form-select form-select-sm">
-                    <option value="">Tất cả</option>
-                    <option value="Nữ">Nữ</option>
-                    <option value="Nam">Nam</option>
-                </select>
+           <select id="searchSex" class="form-select form-select-sm">
+                <option value="">Tất cả</option>
+                <option value="0">Nữ</option>
+                <option value="1">Nam</option>
+            </select>
+
             </th>
-            <th>
-                <select id="searchPosition" class="form-select form-select-sm">
-                    <option value="">Tất cả</option>
-                    @foreach (var pos in Model.Select(e => e.Position).Distinct())
-                    {
-                        <option value="@pos">@pos</option>
-                    }
-                </select>
-            </th>
+          
         </tr>
     </thead>
     <tbody>
@@ -130,32 +122,34 @@
             }
         });
 
-        // --- Filter Table ---
-        function filterResidentTable() {
-            var fullName = document.getElementById('searchFullName').value.toLowerCase();
-            var docNum = document.getElementById('searchDocumentNumber').value.toLowerCase();
-            var address = document.getElementById('searchAddress').value.toLowerCase();
-            var email = document.getElementById('searchEmail').value.toLowerCase();
-            var phone = document.getElementById('searchPhoneNumber').value.toLowerCase();
-            var sex = document.getElementById('searchSex').value;
-            var position = document.getElementById('searchPosition').value;
+    function filterResidentTable() {
+    var fullName = document.getElementById('searchFullName').value.toLowerCase();
+    var docNum = document.getElementById('searchDocumentNumber').value.toLowerCase();
+    var address = document.getElementById('searchAddress').value.toLowerCase();
+    var email = document.getElementById('searchEmail').value.toLowerCase();
+    var phone = document.getElementById('searchPhoneNumber').value.toLowerCase();
+    var sex = document.getElementById('searchSex').value; // "" hoặc "0" hoặc "1"
 
-            var trs = document.getElementById('residentTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+    var trs = document.getElementById('residentTable').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
 
-            for (var i = 0; i < trs.length; i++) {
-                var tds = trs[i].getElementsByTagName('td');
-                var show =
-                    tds[0].innerText.toLowerCase().includes(fullName) &&
-                    tds[1].innerText.toLowerCase().includes(docNum) &&
-                    tds[2].innerText.toLowerCase().includes(address) &&
-                    tds[3].innerText.toLowerCase().includes(email) &&
-                    tds[4].innerText.toLowerCase().includes(phone) &&
-                    (sex === "" || tds[5].innerText === sex) &&
-                    (position === "" || tds[6].innerText === position);
+    for (var i = 0; i < trs.length; i++) {
+        var tds = trs[i].getElementsByTagName('td');
 
-                trs[i].style.display = show ? '' : 'none';
-            }
-        }
+        // Chuyển text giới tính về số để so sánh
+        var sexValue = tds[5].innerText === "Nữ" ? "0" : "1";
+
+        var show =
+            tds[0].innerText.toLowerCase().includes(fullName) &&
+            tds[1].innerText.toLowerCase().includes(docNum) &&
+            tds[2].innerText.toLowerCase().includes(address) &&
+            tds[3].innerText.toLowerCase().includes(email) &&
+            tds[4].innerText.toLowerCase().includes(phone) &&
+            (sex === "" || sexValue === sex); // So sánh số
+
+        trs[i].style.display = show ? '' : 'none';
+    }
+}
+
 
         // Event listener cho input
         document.getElementById('searchFullName').addEventListener('keyup', filterResidentTable);
@@ -166,6 +160,5 @@
 
         // Event listener cho select
         document.getElementById('searchSex').addEventListener('change', filterResidentTable);
-        document.getElementById('searchPosition').addEventListener('change', filterResidentTable);
     </script>
 }
