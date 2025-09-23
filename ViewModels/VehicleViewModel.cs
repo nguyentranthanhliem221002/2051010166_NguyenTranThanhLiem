@@ -54,6 +54,8 @@ namespace _2051010166_NguyenTranThanhLiem.ViewModels
         public string OwnerPhone { get; set; }
 
         //public IFormFile? VehicleImage { get; set; }
+        public IFormFile VehicleImage { get; set; }
+
     }
 
 }

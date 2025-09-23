@@ -1,6 +1,7 @@
 ﻿using _2051010166_NguyenTranThanhLiem.Interfaces;
 using _2051010166_NguyenTranThanhLiem.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace _2051010166_NguyenTranThanhLiem.Repositories
 {
@@ -15,33 +16,36 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             _userManager = userManager;
         }
 
-        public ICollection<User> GetResidents()
+        // Lấy tất cả cư dân
+        public async Task<IEnumerable<User>> GetResidentsAsync()
         {
-            return _context.Users
+            return await _context.Users
                 .Where(x => x.Status >= 0 && x.IsResident && x.Position == "")
                 .OrderByDescending(x => x.CreatedDate)
-                .ToList();
+                .ToListAsync();
         }
 
-        public User GetResidentById(Guid id)
+        // Lấy cư dân theo Id
+        public async Task<User?> GetResidentByIdAsync(Guid id)
         {
-            return _context.Users.FirstOrDefault(x => x.Id == id && x.IsResident);
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == id && x.IsResident);
         }
 
-        public async Task AddResidentAsync(User resident)
+        // Thêm cư dân mới
+        public async Task<User> AddResidentAsync(User resident)
         {
-            // Kiểm tra user trùng
-            if (await _userManager.FindByEmailAsync(resident.Email) != null)
-                throw new Exception("Email đã tồn tại.");
 
-            // Khởi tạo các trường bắt buộc
+            //if (await _userManager.FindByEmailAsync(resident.Email) != null)
+            //    throw new Exception("Email đã tồn tại.");
+
             resident.Id = Guid.NewGuid();
             resident.IsResident = true;
             resident.CreatedDate = DateTime.Now;
             resident.UpdatedDate = DateTime.Now;
             resident.UserName = resident.Email;
             resident.Position ??= "";
-            resident.CreatedBy = Guid.NewGuid();  
+            resident.CreatedBy = Guid.NewGuid();
             resident.UpdatedBy = Guid.NewGuid();
             resident.SecurityStamp = Guid.NewGuid().ToString();
             resident.Status = 1;
@@ -55,13 +59,17 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                     string.Join("; ", result.Errors.Select(e => e.Description)));
             }
 
-            // Thêm role
             await _userManager.AddToRoleAsync(resident, "User");
+
+            return resident;
         }
 
-        public void UpdateResident(User resident)
+        // Cập nhật cư dân
+        public async Task UpdateResidentAsync(User resident)
         {
-            var existing = _context.Users.FirstOrDefault(x => x.Id == resident.Id && x.IsResident);
+            var existing = await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == resident.Id && x.IsResident);
+
             if (existing != null)
             {
                 existing.FullName = resident.FullName;
@@ -70,28 +78,34 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                 existing.Email = resident.Email;
                 existing.PhoneNumber = resident.PhoneNumber;
                 existing.Sex = resident.Sex;
-                existing.Position = resident.Position;
+                existing.Position = "";
                 existing.Status = resident.Status;
-                existing.UpdatedDate = resident.UpdatedDate;
-                _context.SaveChanges();
+                existing.UpdatedDate = DateTime.Now;
+
+                await _context.SaveChangesAsync();
             }
         }
 
-        public bool DeleteResident(Guid id)
+        // Xoá cư dân (soft delete)
+        public async Task<bool> DeleteResidentAsync(Guid id)
         {
-            var resident = _context.Users.FirstOrDefault(x => x.Id == id && x.IsResident);
+            var resident = await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == id && x.IsResident);
+
             if (resident != null)
             {
                 resident.Status = -1;
-                _context.SaveChanges();
+                resident.UpdatedDate = DateTime.Now;
+                await _context.SaveChangesAsync();
                 return true;
             }
             return false;
         }
 
-        public Guid GetPersonIdByUserId(Guid userId)
+        // Lấy PersonId theo UserId
+        public async Task<Guid> GetPersonIdByUserIdAsync(Guid userId)
         {
-            var person = _context.Users.FirstOrDefault(p => p.Id == userId);
+            var person = await _context.Users.FirstOrDefaultAsync(p => p.Id == userId);
             return person?.Id ?? Guid.Empty;
         }
     }

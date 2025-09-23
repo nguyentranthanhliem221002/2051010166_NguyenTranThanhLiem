@@ -1,4 +1,4 @@
-﻿@* @model _2051010166_NguyenTranThanhLiem.ViewModels.VehicleViewModel
+﻿@model _2051010166_NguyenTranThanhLiem.ViewModels.VehicleViewModel
 @{
     ViewData["Title"] = "Vehicle Page";
     Layout = "_ManagerLayout";
@@ -7,72 +7,6 @@
 <h1 class="text-center">Gửi xe tháng</h1>
 
 <div class="container mt-4">
-    <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Đăng ký gửi xe</h4>
-        </div>
-        <div class="card-body">
-            <form asp-action="RegisterVehicle" method="post">
-                <div class="mb-3">
-                    <label asp-for="LicensePlate" class="form-label fw-bold">Biển số xe</label>
-                    <input asp-for="LicensePlate" class="form-control" />
-                    <span asp-validation-for="LicensePlate" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="VehicleTypeId" class="form-label fw-bold">Loại xe</label>
-                    <select asp-for="VehicleTypeId" asp-items="Model.VehicleTypes" class="form-select">
-                        <option value="">-- Chọn loại xe --</option>
-                    </select>
-                    <span asp-validation-for="VehicleTypeId" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="PackageMonths" class="form-label fw-bold">Gói tháng</label>
-                    <select asp-for="PackageMonths" class="form-select">
-                        <option value="1">1 tháng</option>
-                        <option value="3">3 tháng</option>
-                        <option value="6">6 tháng</option>
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="StartDate" class="form-label fw-bold">Ngày bắt đầu gửi</label>
-                    <input asp-for="StartDate" class="form-control" type="date"
-                           value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Color" class="form-label fw-bold">Màu xe</label>
-                    <input asp-for="Color" class="form-control" />
-                </div>
-
-                <button type="submit" class="btn btn-success w-100">
-                    <i class="bi bi-car-front"></i> Đăng ký
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
- *@
-
-@model _2051010166_NguyenTranThanhLiem.ViewModels.VehicleViewModel
-@{
-    ViewData["Title"] = "Vehicle Page";
-    Layout = "_ManagerLayout";
-}
-
-<h1 class="text-center">Gửi xe tháng</h1>
-
-<div class="container mt-4">
-@*     <div class="mb-3">
-        <label for="vehicleTypeSection" class="form-label fw-bold">Chọn loại đăng ký:</label>
-        <select id="vehicleTypeSection" class="form-select w-50">
-            <option value="monthly" selected>Đăng ký gửi xe</option>
-            <option value="other">Đăng ký loại khác (nếu có)</option>
-        </select>
-    </div> *@
-
     <!-- Section đăng ký gửi xe -->
     <div id="vehicle-monthly" class="vehicle-section">
         <div class="card shadow-sm">
@@ -80,7 +14,8 @@
                 <h4 class="mb-0">Đăng ký gửi xe</h4>
             </div>
             <div class="card-body">
-                <form asp-action="Vehicles" asp-controller="Resident" method="post">
+                <!-- Thêm enctype="multipart/form-data" để upload ảnh -->
+                <form asp-action="Vehicles" asp-controller="Resident" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label asp-for="LicensePlate" class="form-label fw-bold">Biển số xe</label>
                         <input asp-for="LicensePlate" class="form-control" />
@@ -135,6 +70,13 @@
                         <span asp-validation-for="OwnerPhone" class="text-danger"></span>
                     </div>
 
+                    <!-- Mục chọn hình ảnh xe -->
+                    <div class="mb-3">
+                        <label asp-for="VehicleImage" class="form-label fw-bold">Hình ảnh xe</label>
+                        <input asp-for="VehicleImage" class="form-control" type="file" accept="image/*" />
+                        <span asp-validation-for="VehicleImage" class="text-danger"></span>
+                    </div>
+
                     <button type="submit" class="btn btn-success w-100">
                         <i class="bi bi-car-front"></i> Đăng ký
                     </button>
@@ -156,7 +98,9 @@
     </div>
 </div>
 
-@* @section Scripts {
+@* Scripts để đổi section nếu muốn (hiện đang comment) *@
+@*
+@section Scripts {
     <script>
         document.getElementById("vehicleTypeSection").addEventListener("change", function () {
             var selected = this.value;
@@ -167,4 +111,4 @@
         });
     </script>
 }
- *@
+*@

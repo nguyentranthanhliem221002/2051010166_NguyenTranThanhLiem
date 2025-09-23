@@ -4,11 +4,11 @@ namespace _2051010166_NguyenTranThanhLiem.Interfaces
 {
     public interface IResidentRepository
     {
-        ICollection<User> GetResidents();
-        User GetResidentById(Guid id);
-        Task AddResidentAsync(User resident);
-        void UpdateResident(User resident);
-        bool DeleteResident(Guid id);
-        Guid GetPersonIdByUserId(Guid userId);
+        Task<IEnumerable<User>> GetResidentsAsync();
+        Task<User?> GetResidentByIdAsync(Guid id);
+        Task<User> AddResidentAsync(User resident);
+        Task UpdateResidentAsync(User resident);
+        Task<bool> DeleteResidentAsync(Guid id);
+        Task<Guid> GetPersonIdByUserIdAsync(Guid userId);
     }
 }

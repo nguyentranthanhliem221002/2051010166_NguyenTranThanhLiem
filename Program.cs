@@ -96,9 +96,10 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     // Danh sách role mặc định
-    string[] roles = { "Admin", "Manager", "User" };
+    string[] roles = { "Admin", "Manager", "Resident", "User" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
@@ -120,7 +121,7 @@ using (var scope = app.Services.CreateScope())
                 FullName = fullName,
                 Address = "HCM",
                 DocumentNumber = "0" + string.Concat(Enumerable.Range(0, 11).Select(_ => random.Next(0, 10).ToString())),
-                Sex = sex, // 1 = Nam, 0 = Nữ
+                Sex = sex,
                 Position = position,
                 IsResident = isResident,
                 PhoneNumber = phoneNumber,
@@ -161,8 +162,19 @@ using (var scope = app.Services.CreateScope())
     await SeedUserAsync("resident4@example.com", "Resident@123", "Le Van D", "0911000004", "", "User", true, 1);
     await SeedUserAsync("resident5@example.com", "Resident@123", "Pham Thi E", "0911000005", "", "User", true, 0);
 
+    // --- Seed VehicleTypes
+    if (!dbContext.VehicleTypes.Any())
+    {
+        dbContext.VehicleTypes.AddRange(
+            new VehicleType { Name = "Xe máy" },
+            new VehicleType { Name = "Ô tô" },
+            new VehicleType { Name = "Xe tải" },
+            new VehicleType { Name = "Xe đạp" },
+            new VehicleType { Name = "Xe đạp" }
 
-
+        );
+        await dbContext.SaveChangesAsync();
+    }
 
 }
 

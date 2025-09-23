@@ -1,0 +1,30 @@
+﻿@model _2051010166_NguyenTranThanhLiem.Models.Apartment
+
+<form asp-action="CreateApartment" asp-controller="Manager" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Mã căn hộ</label>
+        <input asp-for="Code" class="form-control" required />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Tầng</label>
+        <input asp-for="Floor" type="number" class="form-control" required />
+        <span asp-validation-for="Floor" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Chủ sở hữu</label>
+        <select asp-for="PersonId" class="form-select" asp-items="ViewBag.Persons">
+            <option value="">Chọn cư dân</option>
+        </select>
+        <span asp-validation-for="PersonId" class="text-danger"></span>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Thêm mới</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+    </div>
+</form>

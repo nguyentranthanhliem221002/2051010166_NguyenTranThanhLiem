@@ -5,29 +5,30 @@
 <div class="sidebar p-3">
     <ul class="nav flex-column text-center">
 
-        @if (User.IsInRole("Admin"))
+        @* Menu Admin hoặc Manager *@
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
         {
-            <!-- Logo Admin -->
+            <!-- Logo Quản lý -->
             <li class="nav-item mb-4">
                 <a class="nav-link fw-bold fs-4" asp-controller="Admin" asp-action="Index">
-                    <img src="./images/Logo_SNAT.jpg" style="width:60px; height:60px;" /> 
+                    <img src="./images/Logo_SNAT.jpg" style="width:60px; height:60px;" />
                 </a>
-                <h3 class="text-white fw-bold">Quản trị</h3>
+                <h3 class="text-white fw-bold">Quản lý</h3>
             </li>
 
-            <!-- Menu Admin -->
+            <!-- Menu Quản lý chung -->
             <li class="nav-item mb-2">
-                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Apartment">
+                <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Apartment">
                     Quản lý căn hộ
                 </a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Resident">
+                <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Resident">
                     Quản lý cư dân
                 </a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Employee">
+                <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Employee">
                     Quản lý nhân sự
                 </a>
             </li>
@@ -40,27 +41,27 @@
                 <div class="collapse" id="serviceAdminMenu">
                     <ul class="nav flex-column ms-3">
                         <li class="nav-item mb-1">
-                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Maintenance">
+                            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Maintenance">
                                 🛠 Bảo trì
                             </a>
                         </li>
                         <li class="nav-item mb-1">
-                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Vehicle">
+                            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Vehicle">
                                 🚗 Bãi xe
                             </a>
                         </li>
                         <li class="nav-item mb-1">
-                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Electricity">
+                            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Electricity">
                                 ⚡ Điện
                             </a>
                         </li>
                         <li class="nav-item mb-1">
-                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Water">
+                            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Water">
                                 💧 Nước
                             </a>
                         </li>
                         <li class="nav-item mb-1">
-                            <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Wifi">
+                            <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Wifi">
                                 📶 Wifi
                             </a>
                         </li>
@@ -69,15 +70,20 @@
             </li>
 
             <li class="nav-item mb-2">
-                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="Manager_Statistical">
+                <a class="nav-link sidebar-link" asp-controller="Manager" asp-action="Manager_Statistical">
                     Thống kê/ Báo cáo
                 </a>
             </li>
-            <li class="nav-item mt-3">
-                <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="SystemSetting">
-                    Cài đặt
-                </a>
-            </li>
+
+            @* Nếu Admin, show thêm menu Cài đặt *@
+            @if (User.IsInRole("Admin"))
+            {
+                <li class="nav-item mt-3">
+                    <a class="nav-link sidebar-link" asp-controller="Admin" asp-action="SystemSetting">
+                        Cài đặt
+                    </a>
+                </li>
+            }
         }
         else if (User.IsInRole("User"))
         {
@@ -160,5 +166,4 @@
         </li>
 
     </ul>
-
 </div>

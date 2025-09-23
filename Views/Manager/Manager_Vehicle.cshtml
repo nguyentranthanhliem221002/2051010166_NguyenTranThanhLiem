@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "ParkingLot Page";
+    ViewData["Title"] = "Manager_Vehicle Page";
     Layout = "_ManagerLayout";
 }
 
@@ -123,15 +123,15 @@
         });
 
         document.getElementById('approveLink').addEventListener('click', function () {
-            window.location.href = '@Url.Action("VehicleEdit", "Admin")?id=' + currentVehicleId + '&isApproved=true';
+            window.location.href = '@Url.Action("VehicleEdit", "Manager")?id=' + currentVehicleId + '&isApproved=true';
         });
 
         document.getElementById('rejectLink').addEventListener('click', function () {
-            window.location.href = '@Url.Action("VehicleEdit", "Admin")?id=' + currentVehicleId + '&isApproved=false';
+            window.location.href = '@Url.Action("VehicleEdit", "Manager")?id=' + currentVehicleId + '&isApproved=false';
         });
 
         document.getElementById('detailsLink').addEventListener('click', function () {
-            window.location.href = '@Url.Action("VehicleDetails", "Admin")?id=' + currentVehicleId;
+            window.location.href = '@Url.Action("VehicleDetails", "Manager")?id=' + currentVehicleId;
         });
 
         // Map giá trị status dropdown sang text badge

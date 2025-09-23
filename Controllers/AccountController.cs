@@ -21,26 +21,48 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
-            var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ModelState.AddModelError("", "Vui lòng nhập đầy đủ thông tin đăng nhập.");
+                return View();
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Tài khoản không tồn tại.");
+                return View();
+            }
+
+            // ✅ Check mật khẩu
+            var result = await _signInManager.CheckPasswordSignInAsync(user, password, false);
 
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByEmailAsync(email);
+                // ✅ Đăng nhập thật sự (set cookie/session)
+                await _signInManager.SignInAsync(user, isPersistent: false);
+
+                // ✅ Lấy role và redirect
                 var roles = await _userManager.GetRolesAsync(user);
 
                 if (roles.Contains("Admin"))
                     return RedirectToAction("Index", "Admin");
-                else if (roles.Contains("Manager"))
+                if (roles.Contains("Manager"))
                     return RedirectToAction("Index", "Manager");
-                else
+                if (roles.Contains("User"))
                     return RedirectToAction("Index", "Resident");
+
+                return RedirectToAction("Index", "Home"); // nếu chưa có role
             }
 
-            ModelState.AddModelError("", "Email hoặc mật khẩu không đúng");
+            ModelState.AddModelError("", "Email hoặc mật khẩu không đúng.");
             return View();
         }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -48,12 +70,13 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-      
+
         [HttpGet]
         public IActionResult Register() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Register(string email, string password, string role)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(string email, string password)
         {
             var user = new User
             {
@@ -65,11 +88,11 @@ namespace _2051010166_NguyenTranThanhLiem.Controllers
 
             if (result.Succeeded)
             {
-                if (!string.IsNullOrEmpty(role))
-                    await _userManager.AddToRoleAsync(user, role);
+                // ✅ Mặc định role = Resident khi người dùng tự đăng ký
+                await _userManager.AddToRoleAsync(user, "Resident");
 
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Resident");
             }
 
             foreach (var error in result.Errors)

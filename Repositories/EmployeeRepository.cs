@@ -1,6 +1,7 @@
 ﻿using _2051010166_NguyenTranThanhLiem.Interfaces;
 using _2051010166_NguyenTranThanhLiem.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace _2051010166_NguyenTranThanhLiem.Repositories
 {
@@ -15,29 +16,25 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             _userManager = userManager;
         }
 
-        // Lấy tất cả nhân viên
-        public ICollection<User> GetEmployees()
+        public async Task<IEnumerable<User>> GetEmployeesAsync()
         {
-            return _context.Users
+            return await _context.Users
                 .Where(x => x.Status >= 0 && !string.IsNullOrEmpty(x.Position) && !x.IsResident)
                 .OrderByDescending(x => x.CreatedDate)
-                .ToList();
+                .ToListAsync();
         }
 
-        // Lấy nhân viên theo Id
-        public User GetEmployeeById(Guid id)
+        public async Task<User?> GetEmployeeByIdAsync(Guid id)
         {
-            return _context.Users.FirstOrDefault(x => x.Id == id && !x.IsResident && !string.IsNullOrEmpty(x.Position));
+            return await _context.Users
+                .FirstOrDefaultAsync(x => x.Id == id && !x.IsResident && !string.IsNullOrEmpty(x.Position));
         }
 
-        // Thêm nhân viên mới
-        public async Task AddEmployeeAsync(User employee)
+        public async Task<User> AddEmployeeAsync(User employee)
         {
-            // Kiểm tra email trùng
             if (await _userManager.FindByEmailAsync(employee.Email) != null)
                 throw new Exception("Email đã tồn tại.");
 
-            // Khởi tạo các trường bắt buộc
             employee.Id = Guid.NewGuid();
             employee.IsResident = false;
             employee.CreatedDate = DateTime.Now;
@@ -58,14 +55,15 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                     string.Join("; ", result.Errors.Select(e => e.Description)));
             }
 
-            // Thêm role
             await _userManager.AddToRoleAsync(employee, "User");
+
+            return employee;
         }
 
-        // Cập nhật thông tin nhân viên
-        public void UpdateEmployee(User employee)
+
+        public async Task UpdateEmployeeAsync(User employee)
         {
-            var existing = _context.Users.FirstOrDefault(x => x.Id == employee.Id && !x.IsResident);
+            var existing = await _context.Users.FirstOrDefaultAsync(x => x.Id == employee.Id && !x.IsResident);
             if (existing != null)
             {
                 existing.FullName = employee.FullName;
@@ -75,19 +73,20 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                 existing.PhoneNumber = employee.PhoneNumber;
                 existing.Sex = employee.Sex;
                 existing.Status = employee.Status;
-                existing.Position = employee.Position;
+                existing.Position = "Employee";
                 existing.UpdatedDate = DateTime.Now;
-                _context.SaveChanges();
+
+                await _context.SaveChangesAsync();
             }
         }
 
-        public bool DeleteEmployee(Guid id)
+        public async Task<bool> DeleteEmployeeAsync(Guid id)
         {
-            var employee = _context.Users.FirstOrDefault(x => x.Id == id && !x.IsResident);
+            var employee = await _context.Users.FirstOrDefaultAsync(x => x.Id == id && !x.IsResident);
             if (employee != null)
             {
                 employee.Status = -1;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return true;
             }
             return false;

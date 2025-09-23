@@ -1,13 +1,15 @@
 ﻿@{
-    ViewData["Title"] = "Apartment Page";
+    ViewData["Title"] = "Manager_Apartment Page";
     Layout = "_ManagerLayout";
 }
 @model ICollection<Apartment>
 
 <h2>Danh sách căn hộ</h2>
 
-<!-- Nút Thêm mới -->
-<a href="@Url.Action("CreateApartment", "Admin")" class="btn btn-primary mb-3">Thêm mới căn hộ</a>
+<!-- Nút Thêm mới nhân viên -->
+<button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createApartmentModal">
+    Thêm mới căn hộ
+</button>
 
 <table class="table" id="apartmentTable">
     <thead>
@@ -34,6 +36,19 @@
         }
     </tbody>
 </table>
+<div class="modal fade" id="createApartmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm nhân căn hộ mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("Partials/_CreateApartment", new _2051010166_NguyenTranThanhLiem.Models.Apartment())
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Context menu -->
 <div id="contextMenu" style="position:absolute; display:none; background:#fff; border:1px solid #ccc; z-index:1000; box-shadow:0 2px 5px rgba(0,0,0,0.2);">
@@ -61,15 +76,15 @@
 
         document.getElementById('updateLink').addEventListener('click', function () {
             if (currentApartmentId)
-                window.location.href = '@Url.Action("EditApartment", "Admin")?id=' + currentApartmentId;
+                window.location.href = '@Url.Action("EditApartment", "Manager")?id=' + currentApartmentId;
         });
 
         document.getElementById('deleteLink').addEventListener('click', function () {
             if (!currentApartmentId) return;
 
             if (confirm("Bạn có chắc chắn muốn xóa căn hộ này?")) {
-                $.ajax({
-                    url: '@Url.Action("DeleteApartment", "Admin")',
+                 $.ajax({
+                    url: '@Url.Action("DeleteApartment", "Manager")',
                     type: 'POST',
                     data: { id: currentApartmentId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
                     success: function (response) {

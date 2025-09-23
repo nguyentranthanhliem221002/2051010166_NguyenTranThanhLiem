@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Resident Page";
+    ViewData["Title"] = "Manager_Resident Page";
     Layout = "_ManagerLayout";
 }
 @model ICollection<User>
@@ -104,7 +104,7 @@
 
             if (confirm("Bạn có chắc chắn muốn xóa cư dân này?")) {
                 $.ajax({
-                    url: '@Url.Action("DeleteResident", "Admin")',
+                    url: '@Url.Action("DeleteResident", "Manager")',
                     type: 'POST',
                     data: { id: currentResidentId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
                     success: function (response) {

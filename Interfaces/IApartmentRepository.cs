@@ -4,7 +4,11 @@ namespace _2051010166_NguyenTranThanhLiem.Interfaces
 {
     public interface IApartmentRepository
     {
-        IEnumerable<Apartment> GetApartments();
-        Apartment GetApartmentById(int id);
+        Task<IEnumerable<Apartment>> GetApartmentsAsync();
+        Task<Apartment?> GetApartmentByIdAsync(int id);
+        Task<Apartment> AddApartmentAsync(Apartment apartment);
+        Task UpdateApartmentAsync(Apartment apartment);
+        Task<bool> DeleteApartmentAsync(int id);
     }
+
 }

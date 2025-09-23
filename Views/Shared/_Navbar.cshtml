@@ -35,19 +35,23 @@
                 {
                     <!-- Nút Tiện ích -->
                     <li class="nav-item me-2">
-                        <a class="btn btn-info btn-sm"
-                           asp-controller="@(User.IsInRole("Admin") ? "Admin" : "Resident")"
-                           asp-action="Index">
-                            Tiện ích
-                        </a>
+                        @{
+                            var roleController = "Resident"; // mặc định
+                            if (User.IsInRole("Admin")) roleController = "Admin";
+                            else if (User.IsInRole("Manager")) roleController = "Manager";
+                        }
+                        <a class="btn btn-info btn-sm" asp-controller="@roleController" asp-action="Index">Tiện ích</a>
+
                     </li>
 
                     <!-- Nút Đăng xuất -->
                     <li class="nav-item">
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline logout-form">
+                        <form asp-controller="Account" asp-action="Logout" method="post"
+                              class="d-inline logout-form" onsubmit="return confirm('Bạn có chắc chắn muốn đăng xuất không?')">
                             @Html.AntiForgeryToken()
-                            <button type="button" class="btn btn-outline-light btn-sm btn-logout">Đăng xuất</button>
+                            <button type="submit" class="btn btn-outline-light btn-sm">Đăng xuất</button>
                         </form>
+
                     </li>
                 }
                 else
@@ -64,14 +68,3 @@
         </div>
     </div>
 </nav>
-
-<script>
-    document.querySelectorAll('.btn-logout').forEach(function (button) {
-        button.addEventListener('click', function () {
-            if (confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
-                button.closest('form').submit();
-            }
-        });
-    });
-
-</script>

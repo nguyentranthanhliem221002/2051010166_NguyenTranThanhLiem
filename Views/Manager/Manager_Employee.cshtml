@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Employee Page";
+    ViewData["Title"] = "Manager_Employee Page";
     Layout = "_ManagerLayout";
 }
 @model ICollection<User>
@@ -104,7 +104,7 @@
 
         document.getElementById('updateLink').addEventListener('click', function () {
             if (currentEmployeeId)
-                window.location.href = '@Url.Action("EditEmployee", "Admin")?id=' + currentEmployeeId;
+                window.location.href = '@Url.Action("EditEmployee", "Manager")?id=' + currentEmployeeId;
         });
 
         document.getElementById('deleteLink').addEventListener('click', function () {
@@ -112,7 +112,7 @@
 
             if (confirm("Bạn có chắc chắn muốn xóa nhân viên này?")) {
                 $.ajax({
-                    url: '@Url.Action("DeleteEmployee", "Admin")',
+                    url: '@Url.Action("DeleteEmployee", "Manager")',
                     type: 'POST',
                     data: { id: currentEmployeeId, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
                     success: function (response) {
