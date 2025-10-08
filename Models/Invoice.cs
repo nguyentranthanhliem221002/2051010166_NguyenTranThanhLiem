@@ -6,6 +6,8 @@ namespace _2051010166_NguyenTranThanhLiem.Models
     {
         public int Id { get; set; }
         public int ApartmentId { get; set; }
+        public int ServiceId { get; set; }
+        public Service Service { get; set; }
         public Apartment Apartment { get; set; }
         [Column(TypeName = "decimal(20,3)")] 
         public decimal Total {  get; set; }

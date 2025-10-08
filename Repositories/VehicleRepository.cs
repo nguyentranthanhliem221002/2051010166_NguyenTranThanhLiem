@@ -46,21 +46,66 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             return true;
         }
 
+        //public void VehicleEdit(int id, bool isApproved)
+        //{
+        //    var vehicle = _context.Vehicles.Find(id);
+        //    if (vehicle != null)
+        //    {
+        //        vehicle.TrangThaiDuyet = isApproved
+        //            ? Vehicle.ApprovalStatus.Done
+        //            : Vehicle.ApprovalStatus.Cancel;
+
+        //        // Cập nhật Status số nếu vẫn cần (nếu dùng cho logic khác)
+        //        vehicle.Status = isApproved ? 2 : 1;
+
+        //        _context.Vehicles.Update(vehicle);
+        //        _context.SaveChanges();
+        //    }
+        //}
         public void VehicleEdit(int id, bool isApproved)
         {
-            var vehicle = _context.Vehicles.Find(id);
+            var vehicle = _context.Vehicles.Include(v => v.Apartment).FirstOrDefault(v => v.Id == id);
             if (vehicle != null)
             {
                 vehicle.TrangThaiDuyet = isApproved
                     ? Vehicle.ApprovalStatus.Done
                     : Vehicle.ApprovalStatus.Cancel;
 
-                // Cập nhật Status số nếu vẫn cần (nếu dùng cho logic khác)
                 vehicle.Status = isApproved ? 2 : 1;
 
                 _context.Vehicles.Update(vehicle);
                 _context.SaveChanges();
+
+                if (isApproved)
+                {
+                    var invoice = new Invoice
+                    {
+                        ApartmentId = vehicle.ApartmentId.Value,
+                        Total = CalculateTotal(vehicle.PackageMonths, vehicle.VehicleTypeId),
+                        IsPaid = false,
+                        CreatedBy = vehicle.PersonId,
+                        UpdatedBy = vehicle.PersonId,
+                        CreatedDate = DateTime.Now,
+                        UpdatedDate = DateTime.Now,
+                    };
+
+                    _context.Invoices.Add(invoice);
+                    _context.SaveChanges();
+                }
             }
+        }
+
+        // Hàm tính tiền
+        private decimal CalculateTotal(int packageMonths, int vehicleTypeId)
+        {
+            decimal pricePerMonth = 0;
+            switch (vehicleTypeId)
+            {
+                case 1: pricePerMonth = 500_000; break; // xe máy
+                case 2: pricePerMonth = 1_000_000; break; // ô tô
+                default: pricePerMonth = 300_000; break;
+            }
+            return pricePerMonth * packageMonths;
         }
 
         public IEnumerable<Vehicle> GetApprovedVehiclesByUser(Guid personId)

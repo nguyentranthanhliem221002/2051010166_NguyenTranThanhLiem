@@ -1,0 +1,21 @@
+﻿@model List<_2051010166_NguyenTranThanhLiem.Models.Invoice>
+
+<table>
+    <tr>
+        <th>Căn hộ</th>
+        <th>Dịch vụ</th>
+        <th>Tổng tiền</th>
+        <th>Ngày tạo</th>
+        <th>Hạn thanh toán</th>
+    </tr>
+    @foreach (var invoice in Model)
+    {
+        <tr>
+            <td>@invoice.Apartment</td>
+            <td>@invoice.Service.Name</td>
+            <td>@invoice.Total</td>
+            <td>@invoice.CreatedDate.ToString("dd/MM/yyyy")</td>
+            <td>@invoice.CreatedDate.AddDays(7).ToString("dd/MM/yyyy")</td>
+        </tr>
+    }
+</table>

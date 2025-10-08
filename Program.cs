@@ -162,19 +162,32 @@ using (var scope = app.Services.CreateScope())
     await SeedUserAsync("resident4@example.com", "Resident@123", "Le Van D", "0911000004", "", "User", true, 1);
     await SeedUserAsync("resident5@example.com", "Resident@123", "Pham Thi E", "0911000005", "", "User", true, 0);
 
-    // --- Seed VehicleTypes
+    //// --- Seed VehicleTypes
+    //if (!dbContext.VehicleTypes.Any())
+    //{
+    //    dbContext.VehicleTypes.AddRange(
+    //        new VehicleType { Name = "Xe máy" },
+    //        new VehicleType { Name = "Ô tô" },
+    //        new VehicleType { Name = "Xe tải" },
+    //        new VehicleType { Name = "Xe đạp" },
+    //        new VehicleType { Name = "Xe đạp" }
+
+    //    );
+    //    await dbContext.SaveChangesAsync();
+    //}
+
     if (!dbContext.VehicleTypes.Any())
     {
+        var adminId = Guid.Parse("00000000-0000-0000-0000-000000000000"); // có thể thay bằng admin thực
         dbContext.VehicleTypes.AddRange(
-            new VehicleType { Name = "Xe máy" },
-            new VehicleType { Name = "Ô tô" },
-            new VehicleType { Name = "Xe tải" },
-            new VehicleType { Name = "Xe đạp" },
-            new VehicleType { Name = "Xe đạp" }
-
+            new VehicleType { Name = "Xe máy", Fee = 100000, CreatedBy = adminId, CreatedDate = DateTime.Now, Status = 1 },
+            new VehicleType { Name = "Ô tô", Fee = 500000, CreatedBy = adminId, CreatedDate = DateTime.Now, Status = 1 },
+            new VehicleType { Name = "Xe tải", Fee = 300000, CreatedBy = adminId, CreatedDate = DateTime.Now, Status = 1 },
+            new VehicleType { Name = "Xe đạp", Fee = 50000, CreatedBy = adminId, CreatedDate = DateTime.Now, Status = 1 }
         );
         await dbContext.SaveChangesAsync();
     }
+
 
 }
 

@@ -15,8 +15,6 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             _context = context;
             _userManager = userManager;
         }
-
-        // Lấy tất cả cư dân
         public async Task<IEnumerable<User>> GetResidentsAsync()
         {
             return await _context.Users
@@ -25,14 +23,12 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
                 .ToListAsync();
         }
 
-        // Lấy cư dân theo Id
         public async Task<User?> GetResidentByIdAsync(Guid id)
         {
             return await _context.Users
                 .FirstOrDefaultAsync(x => x.Id == id && x.IsResident);
         }
 
-        // Thêm cư dân mới
         public async Task<User> AddResidentAsync(User resident)
         {
 
@@ -64,7 +60,6 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             return resident;
         }
 
-        // Cập nhật cư dân
         public async Task UpdateResidentAsync(User resident)
         {
             var existing = await _context.Users
@@ -86,7 +81,6 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             }
         }
 
-        // Xoá cư dân (soft delete)
         public async Task<bool> DeleteResidentAsync(Guid id)
         {
             var resident = await _context.Users
@@ -101,8 +95,6 @@ namespace _2051010166_NguyenTranThanhLiem.Repositories
             }
             return false;
         }
-
-        // Lấy PersonId theo UserId
         public async Task<Guid> GetPersonIdByUserIdAsync(Guid userId)
         {
             var person = await _context.Users.FirstOrDefaultAsync(p => p.Id == userId);
